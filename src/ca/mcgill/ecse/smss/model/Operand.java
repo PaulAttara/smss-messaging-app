@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 54 "../../../../../SMSS.ump"
+// line 57 "../../../../../SMSS.ump"
 public class Operand
 {
 
@@ -14,8 +14,7 @@ public class Operand
 
   //Operand Associations
   private Condition condition;
-  private List<Message> messages;
-  private List<Fragment> fragments;
+  private List<SpecificMessage> specificMessages;
 
   //------------------------
   // CONSTRUCTOR
@@ -23,8 +22,7 @@ public class Operand
 
   public Operand()
   {
-    messages = new ArrayList<Message>();
-    fragments = new ArrayList<Fragment>();
+    specificMessages = new ArrayList<SpecificMessage>();
   }
 
   //------------------------
@@ -42,63 +40,33 @@ public class Operand
     return has;
   }
   /* Code from template association_GetMany */
-  public Message getMessage(int index)
+  public SpecificMessage getSpecificMessage(int index)
   {
-    Message aMessage = messages.get(index);
-    return aMessage;
+    SpecificMessage aSpecificMessage = specificMessages.get(index);
+    return aSpecificMessage;
   }
 
-  public List<Message> getMessages()
+  public List<SpecificMessage> getSpecificMessages()
   {
-    List<Message> newMessages = Collections.unmodifiableList(messages);
-    return newMessages;
+    List<SpecificMessage> newSpecificMessages = Collections.unmodifiableList(specificMessages);
+    return newSpecificMessages;
   }
 
-  public int numberOfMessages()
+  public int numberOfSpecificMessages()
   {
-    int number = messages.size();
+    int number = specificMessages.size();
     return number;
   }
 
-  public boolean hasMessages()
+  public boolean hasSpecificMessages()
   {
-    boolean has = messages.size() > 0;
+    boolean has = specificMessages.size() > 0;
     return has;
   }
 
-  public int indexOfMessage(Message aMessage)
+  public int indexOfSpecificMessage(SpecificMessage aSpecificMessage)
   {
-    int index = messages.indexOf(aMessage);
-    return index;
-  }
-  /* Code from template association_GetMany */
-  public Fragment getFragment(int index)
-  {
-    Fragment aFragment = fragments.get(index);
-    return aFragment;
-  }
-
-  public List<Fragment> getFragments()
-  {
-    List<Fragment> newFragments = Collections.unmodifiableList(fragments);
-    return newFragments;
-  }
-
-  public int numberOfFragments()
-  {
-    int number = fragments.size();
-    return number;
-  }
-
-  public boolean hasFragments()
-  {
-    boolean has = fragments.size() > 0;
-    return has;
-  }
-
-  public int indexOfFragment(Fragment aFragment)
-  {
-    int index = fragments.indexOf(aFragment);
+    int index = specificMessages.indexOf(aSpecificMessage);
     return index;
   }
   /* Code from template association_SetOptionalOneToOne */
@@ -129,166 +97,74 @@ public class Operand
     return wasSet;
   }
   /* Code from template association_MinimumNumberOfMethod */
-  public static int minimumNumberOfMessages()
+  public static int minimumNumberOfSpecificMessages()
   {
     return 0;
   }
-  /* Code from template association_AddManyToManyMethod */
-  public boolean addMessage(Message aMessage)
+  /* Code from template association_AddManyToOne */
+  public SpecificMessage addSpecificMessage(Message aMessage)
+  {
+    return new SpecificMessage(aMessage, this);
+  }
+
+  public boolean addSpecificMessage(SpecificMessage aSpecificMessage)
   {
     boolean wasAdded = false;
-    if (messages.contains(aMessage)) { return false; }
-    messages.add(aMessage);
-    if (aMessage.indexOfOperand(this) != -1)
+    if (specificMessages.contains(aSpecificMessage)) { return false; }
+    Operand existingOperand = aSpecificMessage.getOperand();
+    boolean isNewOperand = existingOperand != null && !this.equals(existingOperand);
+    if (isNewOperand)
     {
-      wasAdded = true;
+      aSpecificMessage.setOperand(this);
     }
     else
     {
-      wasAdded = aMessage.addOperand(this);
-      if (!wasAdded)
-      {
-        messages.remove(aMessage);
-      }
+      specificMessages.add(aSpecificMessage);
     }
+    wasAdded = true;
     return wasAdded;
   }
-  /* Code from template association_RemoveMany */
-  public boolean removeMessage(Message aMessage)
+
+  public boolean removeSpecificMessage(SpecificMessage aSpecificMessage)
   {
     boolean wasRemoved = false;
-    if (!messages.contains(aMessage))
+    //Unable to remove aSpecificMessage, as it must always have a operand
+    if (!this.equals(aSpecificMessage.getOperand()))
     {
-      return wasRemoved;
-    }
-
-    int oldIndex = messages.indexOf(aMessage);
-    messages.remove(oldIndex);
-    if (aMessage.indexOfOperand(this) == -1)
-    {
+      specificMessages.remove(aSpecificMessage);
       wasRemoved = true;
-    }
-    else
-    {
-      wasRemoved = aMessage.removeOperand(this);
-      if (!wasRemoved)
-      {
-        messages.add(oldIndex,aMessage);
-      }
     }
     return wasRemoved;
   }
   /* Code from template association_AddIndexControlFunctions */
-  public boolean addMessageAt(Message aMessage, int index)
+  public boolean addSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
   {  
     boolean wasAdded = false;
-    if(addMessage(aMessage))
+    if(addSpecificMessage(aSpecificMessage))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfMessages()) { index = numberOfMessages() - 1; }
-      messages.remove(aMessage);
-      messages.add(index, aMessage);
+      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
+      specificMessages.remove(aSpecificMessage);
+      specificMessages.add(index, aSpecificMessage);
       wasAdded = true;
     }
     return wasAdded;
   }
 
-  public boolean addOrMoveMessageAt(Message aMessage, int index)
+  public boolean addOrMoveSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
   {
     boolean wasAdded = false;
-    if(messages.contains(aMessage))
+    if(specificMessages.contains(aSpecificMessage))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfMessages()) { index = numberOfMessages() - 1; }
-      messages.remove(aMessage);
-      messages.add(index, aMessage);
+      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
+      specificMessages.remove(aSpecificMessage);
+      specificMessages.add(index, aSpecificMessage);
       wasAdded = true;
     } 
     else 
     {
-      wasAdded = addMessageAt(aMessage, index);
-    }
-    return wasAdded;
-  }
-  /* Code from template association_MinimumNumberOfMethod */
-  public static int minimumNumberOfFragments()
-  {
-    return 0;
-  }
-  /* Code from template association_AddManyToManyMethod */
-  public boolean addFragment(Fragment aFragment)
-  {
-    boolean wasAdded = false;
-    if (fragments.contains(aFragment)) { return false; }
-    fragments.add(aFragment);
-    if (aFragment.indexOfOperand(this) != -1)
-    {
-      wasAdded = true;
-    }
-    else
-    {
-      wasAdded = aFragment.addOperand(this);
-      if (!wasAdded)
-      {
-        fragments.remove(aFragment);
-      }
-    }
-    return wasAdded;
-  }
-  /* Code from template association_RemoveMany */
-  public boolean removeFragment(Fragment aFragment)
-  {
-    boolean wasRemoved = false;
-    if (!fragments.contains(aFragment))
-    {
-      return wasRemoved;
-    }
-
-    int oldIndex = fragments.indexOf(aFragment);
-    fragments.remove(oldIndex);
-    if (aFragment.indexOfOperand(this) == -1)
-    {
-      wasRemoved = true;
-    }
-    else
-    {
-      wasRemoved = aFragment.removeOperand(this);
-      if (!wasRemoved)
-      {
-        fragments.add(oldIndex,aFragment);
-      }
-    }
-    return wasRemoved;
-  }
-  /* Code from template association_AddIndexControlFunctions */
-  public boolean addFragmentAt(Fragment aFragment, int index)
-  {  
-    boolean wasAdded = false;
-    if(addFragment(aFragment))
-    {
-      if(index < 0 ) { index = 0; }
-      if(index > numberOfFragments()) { index = numberOfFragments() - 1; }
-      fragments.remove(aFragment);
-      fragments.add(index, aFragment);
-      wasAdded = true;
-    }
-    return wasAdded;
-  }
-
-  public boolean addOrMoveFragmentAt(Fragment aFragment, int index)
-  {
-    boolean wasAdded = false;
-    if(fragments.contains(aFragment))
-    {
-      if(index < 0 ) { index = 0; }
-      if(index > numberOfFragments()) { index = numberOfFragments() - 1; }
-      fragments.remove(aFragment);
-      fragments.add(index, aFragment);
-      wasAdded = true;
-    } 
-    else 
-    {
-      wasAdded = addFragmentAt(aFragment, index);
+      wasAdded = addSpecificMessageAt(aSpecificMessage, index);
     }
     return wasAdded;
   }
@@ -302,24 +178,10 @@ public class Operand
       existingCondition.delete();
       existingCondition.setOperand(null);
     }
-    ArrayList<Message> copyOfMessages = new ArrayList<Message>(messages);
-    messages.clear();
-    for(Message aMessage : copyOfMessages)
+    for(int i=specificMessages.size(); i > 0; i--)
     {
-      aMessage.removeOperand(this);
-    }
-    ArrayList<Fragment> copyOfFragments = new ArrayList<Fragment>(fragments);
-    fragments.clear();
-    for(Fragment aFragment : copyOfFragments)
-    {
-      if (aFragment.numberOfOperands() <= Fragment.minimumNumberOfOperands())
-      {
-        aFragment.delete();
-      }
-      else
-      {
-        aFragment.removeOperand(this);
-      }
+      SpecificMessage aSpecificMessage = specificMessages.get(i - 1);
+      aSpecificMessage.delete();
     }
   }
 

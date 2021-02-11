@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 46 "../../../../../SMSS.ump"
+// line 51 "../../../../../SMSS.ump"
 public class Message
 {
 
@@ -18,14 +18,14 @@ public class Message
   //Message Associations
   private SenderObject senderObject;
   private ReceiverObject receiverObject;
-  private List<Operand> operands;
-  private Element element;
+  private List<SpecificElement> specificElements;
+  private List<SpecificMessage> specificMessages;
 
   //------------------------
   // CONSTRUCTOR
   //------------------------
 
-  public Message(String aName, SenderObject aSenderObject, ReceiverObject aReceiverObject, Element aElement)
+  public Message(String aName, SenderObject aSenderObject, ReceiverObject aReceiverObject)
   {
     name = aName;
     boolean didAddSenderObject = setSenderObject(aSenderObject);
@@ -38,12 +38,8 @@ public class Message
     {
       throw new RuntimeException("Unable to create message due to receiverObject. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
-    operands = new ArrayList<Operand>();
-    boolean didAddElement = setElement(aElement);
-    if (!didAddElement)
-    {
-      throw new RuntimeException("Unable to create message due to element. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
-    }
+    specificElements = new ArrayList<SpecificElement>();
+    specificMessages = new ArrayList<SpecificMessage>();
   }
 
   //------------------------
@@ -73,39 +69,64 @@ public class Message
     return receiverObject;
   }
   /* Code from template association_GetMany */
-  public Operand getOperand(int index)
+  public SpecificElement getSpecificElement(int index)
   {
-    Operand aOperand = operands.get(index);
-    return aOperand;
+    SpecificElement aSpecificElement = specificElements.get(index);
+    return aSpecificElement;
   }
 
-  public List<Operand> getOperands()
+  public List<SpecificElement> getSpecificElements()
   {
-    List<Operand> newOperands = Collections.unmodifiableList(operands);
-    return newOperands;
+    List<SpecificElement> newSpecificElements = Collections.unmodifiableList(specificElements);
+    return newSpecificElements;
   }
 
-  public int numberOfOperands()
+  public int numberOfSpecificElements()
   {
-    int number = operands.size();
+    int number = specificElements.size();
     return number;
   }
 
-  public boolean hasOperands()
+  public boolean hasSpecificElements()
   {
-    boolean has = operands.size() > 0;
+    boolean has = specificElements.size() > 0;
     return has;
   }
 
-  public int indexOfOperand(Operand aOperand)
+  public int indexOfSpecificElement(SpecificElement aSpecificElement)
   {
-    int index = operands.indexOf(aOperand);
+    int index = specificElements.indexOf(aSpecificElement);
     return index;
   }
-  /* Code from template association_GetOne */
-  public Element getElement()
+  /* Code from template association_GetMany */
+  public SpecificMessage getSpecificMessage(int index)
   {
-    return element;
+    SpecificMessage aSpecificMessage = specificMessages.get(index);
+    return aSpecificMessage;
+  }
+
+  public List<SpecificMessage> getSpecificMessages()
+  {
+    List<SpecificMessage> newSpecificMessages = Collections.unmodifiableList(specificMessages);
+    return newSpecificMessages;
+  }
+
+  public int numberOfSpecificMessages()
+  {
+    int number = specificMessages.size();
+    return number;
+  }
+
+  public boolean hasSpecificMessages()
+  {
+    boolean has = specificMessages.size() > 0;
+    return has;
+  }
+
+  public int indexOfSpecificMessage(SpecificMessage aSpecificMessage)
+  {
+    int index = specificMessages.indexOf(aSpecificMessage);
+    return index;
   }
   /* Code from template association_SetOneToMany */
   public boolean setSenderObject(SenderObject aSenderObject)
@@ -146,105 +167,148 @@ public class Message
     return wasSet;
   }
   /* Code from template association_MinimumNumberOfMethod */
-  public static int minimumNumberOfOperands()
+  public static int minimumNumberOfSpecificElements()
   {
     return 0;
   }
-  /* Code from template association_AddManyToManyMethod */
-  public boolean addOperand(Operand aOperand)
+  /* Code from template association_AddManyToOne */
+  public SpecificElement addSpecificElement(int aId, Method aMethod)
+  {
+    return new SpecificElement(aId, this, aMethod);
+  }
+
+  public boolean addSpecificElement(SpecificElement aSpecificElement)
   {
     boolean wasAdded = false;
-    if (operands.contains(aOperand)) { return false; }
-    operands.add(aOperand);
-    if (aOperand.indexOfMessage(this) != -1)
+    if (specificElements.contains(aSpecificElement)) { return false; }
+    Message existingMessage = aSpecificElement.getMessage();
+    boolean isNewMessage = existingMessage != null && !this.equals(existingMessage);
+    if (isNewMessage)
     {
-      wasAdded = true;
+      aSpecificElement.setMessage(this);
     }
     else
     {
-      wasAdded = aOperand.addMessage(this);
-      if (!wasAdded)
-      {
-        operands.remove(aOperand);
-      }
+      specificElements.add(aSpecificElement);
     }
+    wasAdded = true;
     return wasAdded;
   }
-  /* Code from template association_RemoveMany */
-  public boolean removeOperand(Operand aOperand)
+
+  public boolean removeSpecificElement(SpecificElement aSpecificElement)
   {
     boolean wasRemoved = false;
-    if (!operands.contains(aOperand))
+    //Unable to remove aSpecificElement, as it must always have a message
+    if (!this.equals(aSpecificElement.getMessage()))
     {
-      return wasRemoved;
-    }
-
-    int oldIndex = operands.indexOf(aOperand);
-    operands.remove(oldIndex);
-    if (aOperand.indexOfMessage(this) == -1)
-    {
+      specificElements.remove(aSpecificElement);
       wasRemoved = true;
-    }
-    else
-    {
-      wasRemoved = aOperand.removeMessage(this);
-      if (!wasRemoved)
-      {
-        operands.add(oldIndex,aOperand);
-      }
     }
     return wasRemoved;
   }
   /* Code from template association_AddIndexControlFunctions */
-  public boolean addOperandAt(Operand aOperand, int index)
+  public boolean addSpecificElementAt(SpecificElement aSpecificElement, int index)
   {  
     boolean wasAdded = false;
-    if(addOperand(aOperand))
+    if(addSpecificElement(aSpecificElement))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfOperands()) { index = numberOfOperands() - 1; }
-      operands.remove(aOperand);
-      operands.add(index, aOperand);
+      if(index > numberOfSpecificElements()) { index = numberOfSpecificElements() - 1; }
+      specificElements.remove(aSpecificElement);
+      specificElements.add(index, aSpecificElement);
       wasAdded = true;
     }
     return wasAdded;
   }
 
-  public boolean addOrMoveOperandAt(Operand aOperand, int index)
+  public boolean addOrMoveSpecificElementAt(SpecificElement aSpecificElement, int index)
   {
     boolean wasAdded = false;
-    if(operands.contains(aOperand))
+    if(specificElements.contains(aSpecificElement))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfOperands()) { index = numberOfOperands() - 1; }
-      operands.remove(aOperand);
-      operands.add(index, aOperand);
+      if(index > numberOfSpecificElements()) { index = numberOfSpecificElements() - 1; }
+      specificElements.remove(aSpecificElement);
+      specificElements.add(index, aSpecificElement);
       wasAdded = true;
     } 
     else 
     {
-      wasAdded = addOperandAt(aOperand, index);
+      wasAdded = addSpecificElementAt(aSpecificElement, index);
     }
     return wasAdded;
   }
-  /* Code from template association_SetOneToMany */
-  public boolean setElement(Element aElement)
+  /* Code from template association_MinimumNumberOfMethod */
+  public static int minimumNumberOfSpecificMessages()
   {
-    boolean wasSet = false;
-    if (aElement == null)
-    {
-      return wasSet;
-    }
+    return 0;
+  }
+  /* Code from template association_AddManyToOne */
+  public SpecificMessage addSpecificMessage(Operand aOperand)
+  {
+    return new SpecificMessage(this, aOperand);
+  }
 
-    Element existingElement = element;
-    element = aElement;
-    if (existingElement != null && !existingElement.equals(aElement))
+  public boolean addSpecificMessage(SpecificMessage aSpecificMessage)
+  {
+    boolean wasAdded = false;
+    if (specificMessages.contains(aSpecificMessage)) { return false; }
+    Message existingMessage = aSpecificMessage.getMessage();
+    boolean isNewMessage = existingMessage != null && !this.equals(existingMessage);
+    if (isNewMessage)
     {
-      existingElement.removeMessage(this);
+      aSpecificMessage.setMessage(this);
     }
-    element.addMessage(this);
-    wasSet = true;
-    return wasSet;
+    else
+    {
+      specificMessages.add(aSpecificMessage);
+    }
+    wasAdded = true;
+    return wasAdded;
+  }
+
+  public boolean removeSpecificMessage(SpecificMessage aSpecificMessage)
+  {
+    boolean wasRemoved = false;
+    //Unable to remove aSpecificMessage, as it must always have a message
+    if (!this.equals(aSpecificMessage.getMessage()))
+    {
+      specificMessages.remove(aSpecificMessage);
+      wasRemoved = true;
+    }
+    return wasRemoved;
+  }
+  /* Code from template association_AddIndexControlFunctions */
+  public boolean addSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
+  {  
+    boolean wasAdded = false;
+    if(addSpecificMessage(aSpecificMessage))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
+      specificMessages.remove(aSpecificMessage);
+      specificMessages.add(index, aSpecificMessage);
+      wasAdded = true;
+    }
+    return wasAdded;
+  }
+
+  public boolean addOrMoveSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
+  {
+    boolean wasAdded = false;
+    if(specificMessages.contains(aSpecificMessage))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
+      specificMessages.remove(aSpecificMessage);
+      specificMessages.add(index, aSpecificMessage);
+      wasAdded = true;
+    } 
+    else 
+    {
+      wasAdded = addSpecificMessageAt(aSpecificMessage, index);
+    }
+    return wasAdded;
   }
 
   public void delete()
@@ -261,17 +325,15 @@ public class Message
     {
       placeholderReceiverObject.removeMessage(this);
     }
-    ArrayList<Operand> copyOfOperands = new ArrayList<Operand>(operands);
-    operands.clear();
-    for(Operand aOperand : copyOfOperands)
+    for(int i=specificElements.size(); i > 0; i--)
     {
-      aOperand.removeMessage(this);
+      SpecificElement aSpecificElement = specificElements.get(i - 1);
+      aSpecificElement.delete();
     }
-    Element placeholderElement = element;
-    this.element = null;
-    if(placeholderElement != null)
+    for(int i=specificMessages.size(); i > 0; i--)
     {
-      placeholderElement.removeMessage(this);
+      SpecificMessage aSpecificMessage = specificMessages.get(i - 1);
+      aSpecificMessage.delete();
     }
   }
 
@@ -281,7 +343,6 @@ public class Message
     return super.toString() + "["+
             "name" + ":" + getName()+ "]" + System.getProperties().getProperty("line.separator") +
             "  " + "senderObject = "+(getSenderObject()!=null?Integer.toHexString(System.identityHashCode(getSenderObject())):"null") + System.getProperties().getProperty("line.separator") +
-            "  " + "receiverObject = "+(getReceiverObject()!=null?Integer.toHexString(System.identityHashCode(getReceiverObject())):"null") + System.getProperties().getProperty("line.separator") +
-            "  " + "element = "+(getElement()!=null?Integer.toHexString(System.identityHashCode(getElement())):"null");
+            "  " + "receiverObject = "+(getReceiverObject()!=null?Integer.toHexString(System.identityHashCode(getReceiverObject())):"null");
   }
 }

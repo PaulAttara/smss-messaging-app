@@ -2,6 +2,7 @@
 /*This code was generated using the UMPLE 1.30.1.5099.60569f335 modeling language!*/
 
 package ca.mcgill.ecse.smss.model;
+import java.util.*;
 
 // line 17 "../../../../../SMSS.ump"
 public class Method
@@ -17,7 +18,7 @@ public class Method
   //Method Associations
   private ClassType classType;
   private SMSS sMSS;
-  private Element element;
+  private List<SpecificElement> specificElements;
 
   //------------------------
   // CONSTRUCTOR
@@ -36,6 +37,7 @@ public class Method
     {
       throw new RuntimeException("Unable to create method due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
+    specificElements = new ArrayList<SpecificElement>();
   }
 
   //------------------------
@@ -64,16 +66,35 @@ public class Method
   {
     return sMSS;
   }
-  /* Code from template association_GetOne */
-  public Element getElement()
+  /* Code from template association_GetMany */
+  public SpecificElement getSpecificElement(int index)
   {
-    return element;
+    SpecificElement aSpecificElement = specificElements.get(index);
+    return aSpecificElement;
   }
 
-  public boolean hasElement()
+  public List<SpecificElement> getSpecificElements()
   {
-    boolean has = element != null;
+    List<SpecificElement> newSpecificElements = Collections.unmodifiableList(specificElements);
+    return newSpecificElements;
+  }
+
+  public int numberOfSpecificElements()
+  {
+    int number = specificElements.size();
+    return number;
+  }
+
+  public boolean hasSpecificElements()
+  {
+    boolean has = specificElements.size() > 0;
     return has;
+  }
+
+  public int indexOfSpecificElement(SpecificElement aSpecificElement)
+  {
+    int index = specificElements.indexOf(aSpecificElement);
+    return index;
   }
   /* Code from template association_SetOneToOptionalOne */
   public boolean setClassType(ClassType aNewClassType)
@@ -122,32 +143,77 @@ public class Method
     wasSet = true;
     return wasSet;
   }
-  /* Code from template association_SetOptionalOneToOne */
-  public boolean setElement(Element aNewElement)
+  /* Code from template association_MinimumNumberOfMethod */
+  public static int minimumNumberOfSpecificElements()
   {
-    boolean wasSet = false;
-    if (element != null && !element.equals(aNewElement) && equals(element.getMethod()))
-    {
-      //Unable to setElement, as existing element would become an orphan
-      return wasSet;
-    }
+    return 0;
+  }
+  /* Code from template association_AddManyToOne */
+  public SpecificElement addSpecificElement(int aId, Message aMessage)
+  {
+    return new SpecificElement(aId, aMessage, this);
+  }
 
-    element = aNewElement;
-    Method anOldMethod = aNewElement != null ? aNewElement.getMethod() : null;
-
-    if (!this.equals(anOldMethod))
+  public boolean addSpecificElement(SpecificElement aSpecificElement)
+  {
+    boolean wasAdded = false;
+    if (specificElements.contains(aSpecificElement)) { return false; }
+    Method existingMethod = aSpecificElement.getMethod();
+    boolean isNewMethod = existingMethod != null && !this.equals(existingMethod);
+    if (isNewMethod)
     {
-      if (anOldMethod != null)
-      {
-        anOldMethod.element = null;
-      }
-      if (element != null)
-      {
-        element.setMethod(this);
-      }
+      aSpecificElement.setMethod(this);
     }
-    wasSet = true;
-    return wasSet;
+    else
+    {
+      specificElements.add(aSpecificElement);
+    }
+    wasAdded = true;
+    return wasAdded;
+  }
+
+  public boolean removeSpecificElement(SpecificElement aSpecificElement)
+  {
+    boolean wasRemoved = false;
+    //Unable to remove aSpecificElement, as it must always have a method
+    if (!this.equals(aSpecificElement.getMethod()))
+    {
+      specificElements.remove(aSpecificElement);
+      wasRemoved = true;
+    }
+    return wasRemoved;
+  }
+  /* Code from template association_AddIndexControlFunctions */
+  public boolean addSpecificElementAt(SpecificElement aSpecificElement, int index)
+  {  
+    boolean wasAdded = false;
+    if(addSpecificElement(aSpecificElement))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfSpecificElements()) { index = numberOfSpecificElements() - 1; }
+      specificElements.remove(aSpecificElement);
+      specificElements.add(index, aSpecificElement);
+      wasAdded = true;
+    }
+    return wasAdded;
+  }
+
+  public boolean addOrMoveSpecificElementAt(SpecificElement aSpecificElement, int index)
+  {
+    boolean wasAdded = false;
+    if(specificElements.contains(aSpecificElement))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfSpecificElements()) { index = numberOfSpecificElements() - 1; }
+      specificElements.remove(aSpecificElement);
+      specificElements.add(index, aSpecificElement);
+      wasAdded = true;
+    } 
+    else 
+    {
+      wasAdded = addSpecificElementAt(aSpecificElement, index);
+    }
+    return wasAdded;
   }
 
   public void delete()
@@ -164,11 +230,10 @@ public class Method
     {
       placeholderSMSS.removeMethod(this);
     }
-    Element existingElement = element;
-    element = null;
-    if (existingElement != null)
+    for(int i=specificElements.size(); i > 0; i--)
     {
-      existingElement.delete();
+      SpecificElement aSpecificElement = specificElements.get(i - 1);
+      aSpecificElement.delete();
     }
   }
 
@@ -178,7 +243,6 @@ public class Method
     return super.toString() + "["+
             "name" + ":" + getName()+ "]" + System.getProperties().getProperty("line.separator") +
             "  " + "classType = "+(getClassType()!=null?Integer.toHexString(System.identityHashCode(getClassType())):"null") + System.getProperties().getProperty("line.separator") +
-            "  " + "sMSS = "+(getSMSS()!=null?Integer.toHexString(System.identityHashCode(getSMSS())):"null") + System.getProperties().getProperty("line.separator") +
-            "  " + "element = "+(getElement()!=null?Integer.toHexString(System.identityHashCode(getElement())):"null");
+            "  " + "sMSS = "+(getSMSS()!=null?Integer.toHexString(System.identityHashCode(getSMSS())):"null");
   }
 }

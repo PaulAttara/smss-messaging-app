@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 41 "../../../../../SMSS.ump"
+// line 40 "../../../../../SMSS.ump"
 public class ReceiverObject extends Object
 {
 
@@ -64,9 +64,9 @@ public class ReceiverObject extends Object
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public Message addMessage(String aName, SenderObject aSenderObject, Element aElement)
+  public Message addMessage(String aName, SenderObject aSenderObject)
   {
-    return new Message(aName, aSenderObject, this, aElement);
+    return new Message(aName, aSenderObject, this);
   }
 
   public boolean addMessage(Message aMessage)

@@ -3,7 +3,7 @@
 
 package ca.mcgill.ecse.smss.model;
 
-// line 29 "../../../../../SMSS.ump"
+// line 28 "../../../../../SMSS.ump"
 public abstract class Object
 {
 

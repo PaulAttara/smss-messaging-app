@@ -15,7 +15,6 @@ public class SMSS
   //SMSS Associations
   private List<Method> methods;
   private List<ClassType> classTypes;
-  private SenderObject senderObject;
 
   //------------------------
   // CONSTRUCTOR
@@ -89,17 +88,6 @@ public class SMSS
   {
     int index = classTypes.indexOf(aClassType);
     return index;
-  }
-  /* Code from template association_GetOne */
-  public SenderObject getSenderObject()
-  {
-    return senderObject;
-  }
-
-  public boolean hasSenderObject()
-  {
-    boolean has = senderObject != null;
-    return has;
   }
   /* Code from template association_MinimumNumberOfMethod */
   public static int minimumNumberOfMethods()
@@ -245,33 +233,6 @@ public class SMSS
     }
     return wasAdded;
   }
-  /* Code from template association_SetOptionalOneToOne */
-  public boolean setSenderObject(SenderObject aNewSenderObject)
-  {
-    boolean wasSet = false;
-    if (senderObject != null && !senderObject.equals(aNewSenderObject) && equals(senderObject.getSMSS()))
-    {
-      //Unable to setSenderObject, as existing senderObject would become an orphan
-      return wasSet;
-    }
-
-    senderObject = aNewSenderObject;
-    SMSS anOldSMSS = aNewSenderObject != null ? aNewSenderObject.getSMSS() : null;
-
-    if (!this.equals(anOldSMSS))
-    {
-      if (anOldSMSS != null)
-      {
-        anOldSMSS.senderObject = null;
-      }
-      if (senderObject != null)
-      {
-        senderObject.setSMSS(this);
-      }
-    }
-    wasSet = true;
-    return wasSet;
-  }
 
   public void delete()
   {
@@ -289,13 +250,6 @@ public class SMSS
       classTypes.remove(aClassType);
     }
     
-    SenderObject existingSenderObject = senderObject;
-    senderObject = null;
-    if (existingSenderObject != null)
-    {
-      existingSenderObject.delete();
-      existingSenderObject.setSMSS(null);
-    }
   }
 
 }

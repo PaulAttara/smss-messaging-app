@@ -4,14 +4,14 @@ class SMSS
 {
   1 <@>- * Method;
   1 <@>- * ClassType;
-  1 <@>- 0..1 SenderObject;
 }
 
-class Element 
+class SpecificElement 
 {
   Integer id;
-  1 -- 0..* Fragment;
-  0..1 -- 1 Method;
+  1 -- 0..1 Fragment;
+  0..* -- 1 Message;
+  0..* -- 1 Method;
 }
 
 class Method 
@@ -23,7 +23,6 @@ class Method
 class ClassType 
 {
   String name;
- 
 }
 
 class Object 
@@ -43,13 +42,17 @@ class ReceiverObject
   isA Object;
 }
 
+class SpecificMessage
+{
+	0..* -- 1 Message;
+	0..* -- 1 Operand;
+}
+
 class Message 
 {
-    String name;
+  String name;
   0..* -- 1 SenderObject;
   0..* -- 1 ReceiverObject;
-  0..* -- 0..* Operand;
-  0..* -- 1 Element;
 }
 class Operand 
 {
@@ -61,7 +64,7 @@ class Condition
 class Fragment 
 {
   abstract;
-  0..* <@>- 2..* Operand;
+  0..* <@>- 2..* SpecificMessage;
 }
 class AlternativeFragment 
 {

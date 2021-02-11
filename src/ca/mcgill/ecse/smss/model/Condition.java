@@ -3,7 +3,7 @@
 
 package ca.mcgill.ecse.smss.model;
 
-// line 58 "../../../../../SMSS.ump"
+// line 61 "../../../../../SMSS.ump"
 public class Condition
 {
 
