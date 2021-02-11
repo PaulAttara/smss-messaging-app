@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 40 "../../../../../SSMS.ump"
+// line 41 "../../../../../SMSS.ump"
 public class ReceiverObject extends Object
 {
 

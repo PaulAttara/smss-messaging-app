@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 34 "../../../../../SSMS.ump"
+// line 35 "../../../../../SMSS.ump"
 public class SenderObject extends Object
 {
 
@@ -16,16 +16,22 @@ public class SenderObject extends Object
   private String name;
 
   //SenderObject Associations
+  private SMSS sMSS;
   private List<Message> messages;
 
   //------------------------
   // CONSTRUCTOR
   //------------------------
 
-  public SenderObject(ClassType aClassType, String aName)
+  public SenderObject(ClassType aClassType, String aName, SMSS aSMSS)
   {
     super(aClassType);
     name = aName;
+    boolean didAddSMSS = setSMSS(aSMSS);
+    if (!didAddSMSS)
+    {
+      throw new RuntimeException("Unable to create senderObject due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+    }
     messages = new ArrayList<Message>();
   }
 
@@ -44,6 +50,11 @@ public class SenderObject extends Object
   public String getName()
   {
     return name;
+  }
+  /* Code from template association_GetOne */
+  public SMSS getSMSS()
+  {
+    return sMSS;
   }
   /* Code from template association_GetMany */
   public Message getMessage(int index)
@@ -74,6 +85,34 @@ public class SenderObject extends Object
   {
     int index = messages.indexOf(aMessage);
     return index;
+  }
+  /* Code from template association_SetOneToOptionalOne */
+  public boolean setSMSS(SMSS aNewSMSS)
+  {
+    boolean wasSet = false;
+    if (aNewSMSS == null)
+    {
+      //Unable to setSMSS to null, as senderObject must always be associated to a sMSS
+      return wasSet;
+    }
+    
+    SenderObject existingSenderObject = aNewSMSS.getSenderObject();
+    if (existingSenderObject != null && !equals(existingSenderObject))
+    {
+      //Unable to setSMSS, the current sMSS already has a senderObject, which would be orphaned if it were re-assigned
+      return wasSet;
+    }
+    
+    SMSS anOldSMSS = sMSS;
+    sMSS = aNewSMSS;
+    sMSS.setSenderObject(this);
+
+    if (anOldSMSS != null)
+    {
+      anOldSMSS.setSenderObject(null);
+    }
+    wasSet = true;
+    return wasSet;
   }
   /* Code from template association_MinimumNumberOfMethod */
   public static int minimumNumberOfMessages()
@@ -150,6 +189,12 @@ public class SenderObject extends Object
 
   public void delete()
   {
+    SMSS existingSMSS = sMSS;
+    sMSS = null;
+    if (existingSMSS != null)
+    {
+      existingSMSS.setSenderObject(null);
+    }
     for(int i=messages.size(); i > 0; i--)
     {
       Message aMessage = messages.get(i - 1);
@@ -162,6 +207,7 @@ public class SenderObject extends Object
   public String toString()
   {
     return super.toString() + "["+
-            "name" + ":" + getName()+ "]";
+            "name" + ":" + getName()+ "]" + System.getProperties().getProperty("line.separator") +
+            "  " + "sMSS = "+(getSMSS()!=null?Integer.toHexString(System.identityHashCode(getSMSS())):"null");
   }
 }

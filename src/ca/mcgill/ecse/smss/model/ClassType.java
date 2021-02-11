@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 22 "../../../../../SSMS.ump"
+// line 23 "../../../../../SMSS.ump"
 public class ClassType
 {
 
@@ -27,18 +27,11 @@ public class ClassType
   public ClassType(String aName, SMSS aSMSS)
   {
     name = aName;
-    if (aSMSS == null || aSMSS.getClassType() != null)
+    boolean didAddSMSS = setSMSS(aSMSS);
+    if (!didAddSMSS)
     {
-      throw new RuntimeException("Unable to create ClassType due to aSMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+      throw new RuntimeException("Unable to create classType due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
-    sMSS = aSMSS;
-    objects = new ArrayList<Object>();
-  }
-
-  public ClassType(String aName, Method aMethodForSMSS)
-  {
-    name = aName;
-    sMSS = new SMSS(aMethodForSMSS, this);
     objects = new ArrayList<Object>();
   }
 
@@ -103,6 +96,25 @@ public class ClassType
   {
     int index = objects.indexOf(aObject);
     return index;
+  }
+  /* Code from template association_SetOneToMany */
+  public boolean setSMSS(SMSS aSMSS)
+  {
+    boolean wasSet = false;
+    if (aSMSS == null)
+    {
+      return wasSet;
+    }
+
+    SMSS existingSMSS = sMSS;
+    sMSS = aSMSS;
+    if (existingSMSS != null && !existingSMSS.equals(aSMSS))
+    {
+      existingSMSS.removeClassType(this);
+    }
+    sMSS.addClassType(this);
+    wasSet = true;
+    return wasSet;
   }
   /* Code from template association_SetOptionalOneToOne */
   public boolean setMethod(Method aNewMethod)
@@ -203,11 +215,11 @@ public class ClassType
 
   public void delete()
   {
-    SMSS existingSMSS = sMSS;
-    sMSS = null;
-    if (existingSMSS != null)
+    SMSS placeholderSMSS = sMSS;
+    this.sMSS = null;
+    if(placeholderSMSS != null)
     {
-      existingSMSS.delete();
+      placeholderSMSS.removeClassType(this);
     }
     Method existingMethod = method;
     method = null;

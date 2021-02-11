@@ -3,7 +3,7 @@
 
 package ca.mcgill.ecse.smss.model;
 
-// line 16 "../../../../../SSMS.ump"
+// line 17 "../../../../../SMSS.ump"
 public class Method
 {
 
@@ -31,22 +31,11 @@ public class Method
     {
       throw new RuntimeException("Unable to create method due to classType. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
-    if (aSMSS == null || aSMSS.getMethod() != null)
+    boolean didAddSMSS = setSMSS(aSMSS);
+    if (!didAddSMSS)
     {
-      throw new RuntimeException("Unable to create Method due to aSMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+      throw new RuntimeException("Unable to create method due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
-    sMSS = aSMSS;
-  }
-
-  public Method(String aName, ClassType aClassType, ClassType aClassTypeForSMSS)
-  {
-    name = aName;
-    boolean didAddClassType = setClassType(aClassType);
-    if (!didAddClassType)
-    {
-      throw new RuntimeException("Unable to create method due to classType. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
-    }
-    sMSS = new SMSS(this, aClassTypeForSMSS);
   }
 
   //------------------------
@@ -114,6 +103,25 @@ public class Method
     wasSet = true;
     return wasSet;
   }
+  /* Code from template association_SetOneToMany */
+  public boolean setSMSS(SMSS aSMSS)
+  {
+    boolean wasSet = false;
+    if (aSMSS == null)
+    {
+      return wasSet;
+    }
+
+    SMSS existingSMSS = sMSS;
+    sMSS = aSMSS;
+    if (existingSMSS != null && !existingSMSS.equals(aSMSS))
+    {
+      existingSMSS.removeMethod(this);
+    }
+    sMSS.addMethod(this);
+    wasSet = true;
+    return wasSet;
+  }
   /* Code from template association_SetOptionalOneToOne */
   public boolean setElement(Element aNewElement)
   {
@@ -150,11 +158,11 @@ public class Method
     {
       existingClassType.setMethod(null);
     }
-    SMSS existingSMSS = sMSS;
-    sMSS = null;
-    if (existingSMSS != null)
+    SMSS placeholderSMSS = sMSS;
+    this.sMSS = null;
+    if(placeholderSMSS != null)
     {
-      existingSMSS.delete();
+      placeholderSMSS.removeMethod(this);
     }
     Element existingElement = element;
     element = null;

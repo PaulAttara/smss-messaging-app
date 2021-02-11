@@ -2,8 +2,9 @@ namespace ca.mcgill.ecse.smss.model;
 
 class SMSS
 {
-  1 <@>- 1 Method;
-  1 <@>- 1 ClassType;
+  1 <@>- * Method;
+  1 <@>- * ClassType;
+  1 <@>- 0..1 SenderObject;
 }
 
 class Element 

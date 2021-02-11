@@ -1,8 +1,9 @@
 package ca.mcgill.ecse.smss.application;
-import ca.mcgill.ecse.smss.view.SmssPage;
 import ca.mcgill.ecse.smss.model.SMSS;
+import ca.mcgill.ecse.smss.view.SmssPage;;
 
 public class SmssApplication {
+	
 	private static SMSS smss;
 	
 	public static void main(String[] args) {
@@ -11,16 +12,15 @@ public class SmssApplication {
             public void run() {
                 new SmssPage().setVisible(true);
             }
-        });
-        
+        });   
 	}
-
 
 	public static SMSS getSmss() {
 		if (smss == null) {
-			// load model
-			smss = new SSMS();
+			smss = new SMSS();
 		}
- 		return ssms;
+ 		return smss;
 	}
+	
+
 }
