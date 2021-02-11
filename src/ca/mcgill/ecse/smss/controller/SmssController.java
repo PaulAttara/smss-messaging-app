@@ -65,10 +65,25 @@ public class SmssController {
 		}
 	}
 	public static String getMethodName() {
-		return SmssApplication.getSmss().getMethod(0).getName();
+		return SmssApplication.getSmss().getMethod().getName();
 	}
-	public static String getSenderName() {
-		return SmssApplication.getSmss().getSenderObject().getName();
+	public static SenderObject getSenderName() throws InvalidInputException {
+		// get all objects
+		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
+		
+		SenderObject sender = null;
+		// find sender object
+		for(Object o : objects) {
+			if(o instanceof SenderObject) {
+				sender = (SenderObject) o;
+			}
+		}
+		if(sender != null) {
+			return sender;
+		}
+			
+		return null;
+		
 	}
 	public static List<ClassType> getClassTypes() {
 		return SmssApplication.getSmss().getClassTypes();
