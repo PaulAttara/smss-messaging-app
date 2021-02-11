@@ -29,7 +29,12 @@ public class SmssController {
 	// but this did not work. when trying to use smss.setSender(), theres a weird thing that says:
 	// "Unable to setSenderObject, as existing senderObject would become an orphan"
 	
+	public static void createSmss() throws InvalidInputException {
+		SMSS smss = SmssApplication.getSmss();
+		smss.addClassType(new ClassType("smss", smss));
+
 	
+	}
 	public static void createMethod(String name) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
 		try {

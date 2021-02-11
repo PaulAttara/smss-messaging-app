@@ -70,6 +70,7 @@ public class SmssPage extends JFrame {
 	public SmssPage() {
 		initComponents();
 		refreshData();
+		SsmsController.createSmss();
 	}
 
 	
