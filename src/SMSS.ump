@@ -29,7 +29,7 @@ class Object
 {
   abstract;
   0..* -- 1 ClassType;
-}
+}`
 
 class SenderObject 
 {

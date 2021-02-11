@@ -1,4 +1,5 @@
 package ca.mcgill.ecse.smss.application;
+import ca.mcgill.ecse.smss.controller.InvalidInputException;
 import ca.mcgill.ecse.smss.model.SMSS;
 import ca.mcgill.ecse.smss.view.SmssPage;;
 
@@ -10,7 +11,12 @@ public class SmssApplication {
 		// start UI
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new SmssPage().setVisible(true);
+                try {
+					new SmssPage().setVisible(true);
+				} catch (InvalidInputException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
         });   
 	}

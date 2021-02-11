@@ -62,7 +62,7 @@ public class SmssPage extends JFrame {
 	// Messages...
 	// Fragments...
 	
-	
+
 	// data elements
 	private String error = null;
 	private HashMap<Integer, ClassType> classTypes;
@@ -76,8 +76,6 @@ public class SmssPage extends JFrame {
 			error = e.getMessage();
 		}
 	}
-
-	
 	
 	private void initComponents() {
 		// elements for error message
@@ -141,35 +139,7 @@ public class SmssPage extends JFrame {
 		
 		
 		// UI Layout
-//		JSeparator horizontalLineTop = new JSeparator();
-//		JSeparator horizontalLineMiddle = new JSeparator();
-//
-//		GroupLayout layout = new GroupLayout(getContentPane());
-//		getContentPane().setLayout(layout);
-//		layout.setAutoCreateGaps(true);
-//		layout.setAutoCreateContainerGaps(true);
-//		layout.setHorizontalGroup(
-//				layout.createSequentialGroup()
-//				.addGroup(layout.createParallelGroup()
-//						.addComponent(errorMessage)
-//						.addComponent(horizontalLineTop)
-//						.addComponent(horizontalLineMiddle)
-//						.addGroup(layout.createSequentialGroup()
-//								.addGroup(layout.createParallelGroup()
-//										.addComponent(methodNameLabel)
-//										.addComponent(senderNameLabel)))));
-//		
-//		layout.linkSize(SwingConstants.VERTICAL, new java.awt.Component[] {methodNameLabel, senderNameLabel});
 
-		
-//		layout.setVerticalGroup(
-//				layout.createParallelGroup()
-//				.addGroup(layout.createSequentialGroup()
-//						.addComponent(errorMessage)
-//						.addGroup(layout.createParallelGroup()
-//								.addComponent(methodNameTextField)
-//								.addComponent(senderNameTextField))));
-		
 		pack();
 
 							
@@ -186,8 +156,8 @@ public class SmssPage extends JFrame {
 			classNameTextField.setText("");
 			
 			// set values of labels 
-			methodNameLabel.setText(SmssController.getMethodName());
-			senderNameLabel.setText(SmssController.getSenderName());
+//			methodNameLabel.setText(SmssController.getMethodName());
+			//senderNameLabel.setText(SmssController.getSenderName());
 			
 			// set values for combo boxes
 			classTypes = new HashMap<Integer, ClassType>();
