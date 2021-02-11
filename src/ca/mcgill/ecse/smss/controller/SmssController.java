@@ -35,10 +35,10 @@ public class SmssController {
 	}
 	
 	public static void createMethod(String name) throws InvalidInputException {
+		SMSS smss = SmssApplication.getSmss();
 		try {
-			SMSS smss = SmssApplication.getSmss();
 			// smss class will always be the first one since thats the first one automatically created
-			smss.addMethod(new Method(name, smss.getClassType(0), smss));
+			smss.setMethod(new Method(name, smss.getClassType(0), smss));
 		}
 		catch (RuntimeException e) {
 			throw new InvalidInputException(e.getMessage());
@@ -58,8 +58,7 @@ public class SmssController {
 	public static void createSender(String name) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
 		try {
-			// for now, just to be able to create a sender, i will do hack
-			smss.getClassType(0).addObject(new SenderObject(smss.getClassType(0), "the cheese", smss));
+			smss.getClassType(0).addObject(new SenderObject(smss.getClassType(0), name));
 		}
 		catch (RuntimeException e) {
 			throw new InvalidInputException(e.getMessage());
