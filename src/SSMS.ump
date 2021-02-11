@@ -1,0 +1,72 @@
+namespace ca.mcgill.ecse.ssms.model;
+
+class SMSS
+{
+  1 <@>- 1 Method;
+  1 <@>- 1 ClassType;
+}
+
+class Element 
+{
+  Integer id;
+  1 -- 0..* Fragment;
+  0..1 -- 1 Method;
+}
+
+class Method 
+{
+  String name;
+  0..1 -- 1 ClassType;
+}
+
+class ClassType 
+{
+  String name;
+ 
+}
+
+class Object 
+{
+  abstract;
+  0..* -- 1 ClassType;
+}
+
+class SenderObject 
+{
+    isA Object;
+    String name;
+}
+
+class ReceiverObject 
+{
+  isA Object;
+}
+
+class Message 
+{
+    String name;
+  0..* -- 1 SenderObject;
+  0..* -- 1 ReceiverObject;
+  0..* -- 0..* Operand;
+  0..* -- 1 Element;
+}
+class Operand 
+{
+  1 <@>- 0..1 Condition;
+}
+class Condition 
+{
+}
+class Fragment 
+{
+  abstract;
+  0..* <@>- 2..* Operand;
+}
+class AlternativeFragment 
+{
+  isA Fragment;
+}
+class ParallelFragment 
+{
+    isA Fragment;
+}

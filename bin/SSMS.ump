@@ -1,7 +1,9 @@
+namespace ca.mcgill.ecse.ssms.model;
+
 class SMSS
 {
   1 <@>- 1 Method;
-  1 <@>- 1 Class;
+  1 <@>- 1 ClassType;
 }
 
 class Element 
@@ -14,11 +16,10 @@ class Element
 class Method 
 {
   String name;
-  0..1 -- 1 Class;
-  0..1 -- 0..1 Element;
+  0..1 -- 1 ClassType;
 }
 
-class Class 
+class ClassType 
 {
   String name;
  
@@ -27,7 +28,7 @@ class Class
 class Object 
 {
   abstract;
-  1..* -- 1 Class;
+  0..* -- 1 ClassType;
 }
 
 class SenderObject 
