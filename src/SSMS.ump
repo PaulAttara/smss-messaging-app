@@ -1,4 +1,4 @@
-namespace ca.mcgill.ecse.ssms.model;
+namespace ca.mcgill.ecse.smss.model;
 
 class SMSS
 {
