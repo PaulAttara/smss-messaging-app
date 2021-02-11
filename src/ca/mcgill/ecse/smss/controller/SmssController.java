@@ -32,14 +32,12 @@ public class SmssController {
 	public static void createSmss() throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
 		smss.addClassType(new ClassType("smss", smss));
-
-	
 	}
+	
 	public static void createMethod(String name) throws InvalidInputException {
-		SMSS smss = SmssApplication.getSmss();
 		try {
-			// FOR NOW GOING TO CREATE A CLASS SO THAT I CAN CREATE METHOD
-			smss.addClassType(new ClassType("main", smss));
+			SMSS smss = SmssApplication.getSmss();
+			// smss class will always be the first one since thats the first one automatically created
 			smss.addMethod(new Method(name, smss.getClassType(0), smss));
 		}
 		catch (RuntimeException e) {

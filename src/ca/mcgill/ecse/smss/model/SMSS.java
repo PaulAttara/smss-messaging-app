@@ -13,7 +13,7 @@ public class SMSS
   //------------------------
 
   //SMSS Associations
-  private List<Method> methods;
+  private Method method;
   private List<ClassType> classTypes;
 
   //------------------------
@@ -22,42 +22,22 @@ public class SMSS
 
   public SMSS()
   {
-    methods = new ArrayList<Method>();
     classTypes = new ArrayList<ClassType>();
   }
 
   //------------------------
   // INTERFACE
   //------------------------
-  /* Code from template association_GetMany */
-  public Method getMethod(int index)
+  /* Code from template association_GetOne */
+  public Method getMethod()
   {
-    Method aMethod = methods.get(index);
-    return aMethod;
+    return method;
   }
 
-  public List<Method> getMethods()
+  public boolean hasMethod()
   {
-    List<Method> newMethods = Collections.unmodifiableList(methods);
-    return newMethods;
-  }
-
-  public int numberOfMethods()
-  {
-    int number = methods.size();
-    return number;
-  }
-
-  public boolean hasMethods()
-  {
-    boolean has = methods.size() > 0;
+    boolean has = method != null;
     return has;
-  }
-
-  public int indexOfMethod(Method aMethod)
-  {
-    int index = methods.indexOf(aMethod);
-    return index;
   }
   /* Code from template association_GetMany */
   public ClassType getClassType(int index)
@@ -89,77 +69,32 @@ public class SMSS
     int index = classTypes.indexOf(aClassType);
     return index;
   }
-  /* Code from template association_MinimumNumberOfMethod */
-  public static int minimumNumberOfMethods()
+  /* Code from template association_SetOptionalOneToOne */
+  public boolean setMethod(Method aNewMethod)
   {
-    return 0;
-  }
-  /* Code from template association_AddManyToOne */
-  public Method addMethod(String aName, ClassType aClassType)
-  {
-    return new Method(aName, aClassType, this);
-  }
+    boolean wasSet = false;
+    if (method != null && !method.equals(aNewMethod) && equals(method.getSMSS()))
+    {
+      //Unable to setMethod, as existing method would become an orphan
+      return wasSet;
+    }
 
-  public boolean addMethod(Method aMethod)
-  {
-    boolean wasAdded = false;
-    if (methods.contains(aMethod)) { return false; }
-    SMSS existingSMSS = aMethod.getSMSS();
-    boolean isNewSMSS = existingSMSS != null && !this.equals(existingSMSS);
-    if (isNewSMSS)
-    {
-      aMethod.setSMSS(this);
-    }
-    else
-    {
-      methods.add(aMethod);
-    }
-    wasAdded = true;
-    return wasAdded;
-  }
+    method = aNewMethod;
+    SMSS anOldSMSS = aNewMethod != null ? aNewMethod.getSMSS() : null;
 
-  public boolean removeMethod(Method aMethod)
-  {
-    boolean wasRemoved = false;
-    //Unable to remove aMethod, as it must always have a sMSS
-    if (!this.equals(aMethod.getSMSS()))
+    if (!this.equals(anOldSMSS))
     {
-      methods.remove(aMethod);
-      wasRemoved = true;
+      if (anOldSMSS != null)
+      {
+        anOldSMSS.method = null;
+      }
+      if (method != null)
+      {
+        method.setSMSS(this);
+      }
     }
-    return wasRemoved;
-  }
-  /* Code from template association_AddIndexControlFunctions */
-  public boolean addMethodAt(Method aMethod, int index)
-  {  
-    boolean wasAdded = false;
-    if(addMethod(aMethod))
-    {
-      if(index < 0 ) { index = 0; }
-      if(index > numberOfMethods()) { index = numberOfMethods() - 1; }
-      methods.remove(aMethod);
-      methods.add(index, aMethod);
-      wasAdded = true;
-    }
-    return wasAdded;
-  }
-
-  public boolean addOrMoveMethodAt(Method aMethod, int index)
-  {
-    boolean wasAdded = false;
-    if(methods.contains(aMethod))
-    {
-      if(index < 0 ) { index = 0; }
-      if(index > numberOfMethods()) { index = numberOfMethods() - 1; }
-      methods.remove(aMethod);
-      methods.add(index, aMethod);
-      wasAdded = true;
-    } 
-    else 
-    {
-      wasAdded = addMethodAt(aMethod, index);
-    }
-    return wasAdded;
+    wasSet = true;
+    return wasSet;
   }
   /* Code from template association_MinimumNumberOfMethod */
   public static int minimumNumberOfClassTypes()
@@ -236,13 +171,13 @@ public class SMSS
 
   public void delete()
   {
-    while (methods.size() > 0)
+    Method existingMethod = method;
+    method = null;
+    if (existingMethod != null)
     {
-      Method aMethod = methods.get(methods.size() - 1);
-      aMethod.delete();
-      methods.remove(aMethod);
+      existingMethod.delete();
+      existingMethod.setSMSS(null);
     }
-    
     while (classTypes.size() > 0)
     {
       ClassType aClassType = classTypes.get(classTypes.size() - 1);

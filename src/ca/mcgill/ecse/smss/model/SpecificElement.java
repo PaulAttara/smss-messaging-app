@@ -8,10 +8,16 @@ public class SpecificElement
 {
 
   //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static int nextId = 1;
+
+  //------------------------
   // MEMBER VARIABLES
   //------------------------
 
-  //SpecificElement Attributes
+  //Autounique Attributes
   private int id;
 
   //SpecificElement Associations
@@ -23,9 +29,9 @@ public class SpecificElement
   // CONSTRUCTOR
   //------------------------
 
-  public SpecificElement(int aId, Message aMessage, Method aMethod)
+  public SpecificElement(Message aMessage, Method aMethod)
   {
-    id = aId;
+    id = nextId++;
     boolean didAddMessage = setMessage(aMessage);
     if (!didAddMessage)
     {
@@ -41,14 +47,6 @@ public class SpecificElement
   //------------------------
   // INTERFACE
   //------------------------
-
-  public boolean setId(int aId)
-  {
-    boolean wasSet = false;
-    id = aId;
-    wasSet = true;
-    return wasSet;
-  }
 
   public int getId()
   {

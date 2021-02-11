@@ -4,9 +4,15 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 51 "../../../../../SMSS.ump"
+// line 52 "../../../../../SMSS.ump"
 public class Message
 {
+
+  //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static Map<String, Message> messagesByName = new HashMap<String, Message>();
 
   //------------------------
   // MEMBER VARIABLES
@@ -27,7 +33,10 @@ public class Message
 
   public Message(String aName, SenderObject aSenderObject, ReceiverObject aReceiverObject)
   {
-    name = aName;
+    if (!setName(aName))
+    {
+      throw new RuntimeException("Cannot create due to duplicate name. See http://manual.umple.org?RE003ViolationofUniqueness.html");
+    }
     boolean didAddSenderObject = setSenderObject(aSenderObject);
     if (!didAddSenderObject)
     {
@@ -49,14 +58,35 @@ public class Message
   public boolean setName(String aName)
   {
     boolean wasSet = false;
+    String anOldName = getName();
+    if (anOldName != null && anOldName.equals(aName)) {
+      return true;
+    }
+    if (hasWithName(aName)) {
+      return wasSet;
+    }
     name = aName;
     wasSet = true;
+    if (anOldName != null) {
+      messagesByName.remove(anOldName);
+    }
+    messagesByName.put(aName, this);
     return wasSet;
   }
 
   public String getName()
   {
     return name;
+  }
+  /* Code from template attribute_GetUnique */
+  public static Message getWithName(String aName)
+  {
+    return messagesByName.get(aName);
+  }
+  /* Code from template attribute_HasUnique */
+  public static boolean hasWithName(String aName)
+  {
+    return getWithName(aName) != null;
   }
   /* Code from template association_GetOne */
   public SenderObject getSenderObject()
@@ -172,9 +202,9 @@ public class Message
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public SpecificElement addSpecificElement(int aId, Method aMethod)
+  public SpecificElement addSpecificElement(Method aMethod)
   {
-    return new SpecificElement(aId, this, aMethod);
+    return new SpecificElement(this, aMethod);
   }
 
   public boolean addSpecificElement(SpecificElement aSpecificElement)
@@ -313,6 +343,7 @@ public class Message
 
   public void delete()
   {
+    messagesByName.remove(getName());
     SenderObject placeholderSenderObject = senderObject;
     this.senderObject = null;
     if(placeholderSenderObject != null)

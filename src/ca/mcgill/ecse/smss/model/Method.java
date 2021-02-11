@@ -9,6 +9,12 @@ public class Method
 {
 
   //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static Map<String, Method> methodsByName = new HashMap<String, Method>();
+
+  //------------------------
   // MEMBER VARIABLES
   //------------------------
 
@@ -26,7 +32,10 @@ public class Method
 
   public Method(String aName, ClassType aClassType, SMSS aSMSS)
   {
-    name = aName;
+    if (!setName(aName))
+    {
+      throw new RuntimeException("Cannot create due to duplicate name. See http://manual.umple.org?RE003ViolationofUniqueness.html");
+    }
     boolean didAddClassType = setClassType(aClassType);
     if (!didAddClassType)
     {
@@ -47,14 +56,35 @@ public class Method
   public boolean setName(String aName)
   {
     boolean wasSet = false;
+    String anOldName = getName();
+    if (anOldName != null && anOldName.equals(aName)) {
+      return true;
+    }
+    if (hasWithName(aName)) {
+      return wasSet;
+    }
     name = aName;
     wasSet = true;
+    if (anOldName != null) {
+      methodsByName.remove(anOldName);
+    }
+    methodsByName.put(aName, this);
     return wasSet;
   }
 
   public String getName()
   {
     return name;
+  }
+  /* Code from template attribute_GetUnique */
+  public static Method getWithName(String aName)
+  {
+    return methodsByName.get(aName);
+  }
+  /* Code from template attribute_HasUnique */
+  public static boolean hasWithName(String aName)
+  {
+    return getWithName(aName) != null;
   }
   /* Code from template association_GetOne */
   public ClassType getClassType()
@@ -124,22 +154,31 @@ public class Method
     wasSet = true;
     return wasSet;
   }
-  /* Code from template association_SetOneToMany */
-  public boolean setSMSS(SMSS aSMSS)
+  /* Code from template association_SetOneToOptionalOne */
+  public boolean setSMSS(SMSS aNewSMSS)
   {
     boolean wasSet = false;
-    if (aSMSS == null)
+    if (aNewSMSS == null)
     {
+      //Unable to setSMSS to null, as method must always be associated to a sMSS
       return wasSet;
     }
-
-    SMSS existingSMSS = sMSS;
-    sMSS = aSMSS;
-    if (existingSMSS != null && !existingSMSS.equals(aSMSS))
+    
+    Method existingMethod = aNewSMSS.getMethod();
+    if (existingMethod != null && !equals(existingMethod))
     {
-      existingSMSS.removeMethod(this);
+      //Unable to setSMSS, the current sMSS already has a method, which would be orphaned if it were re-assigned
+      return wasSet;
     }
-    sMSS.addMethod(this);
+    
+    SMSS anOldSMSS = sMSS;
+    sMSS = aNewSMSS;
+    sMSS.setMethod(this);
+
+    if (anOldSMSS != null)
+    {
+      anOldSMSS.setMethod(null);
+    }
     wasSet = true;
     return wasSet;
   }
@@ -149,9 +188,9 @@ public class Method
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public SpecificElement addSpecificElement(int aId, Message aMessage)
+  public SpecificElement addSpecificElement(Message aMessage)
   {
-    return new SpecificElement(aId, aMessage, this);
+    return new SpecificElement(aMessage, this);
   }
 
   public boolean addSpecificElement(SpecificElement aSpecificElement)
@@ -218,17 +257,18 @@ public class Method
 
   public void delete()
   {
+    methodsByName.remove(getName());
     ClassType existingClassType = classType;
     classType = null;
     if (existingClassType != null)
     {
       existingClassType.setMethod(null);
     }
-    SMSS placeholderSMSS = sMSS;
-    this.sMSS = null;
-    if(placeholderSMSS != null)
+    SMSS existingSMSS = sMSS;
+    sMSS = null;
+    if (existingSMSS != null)
     {
-      placeholderSMSS.removeMethod(this);
+      existingSMSS.setMethod(null);
     }
     for(int i=specificElements.size(); i > 0; i--)
     {

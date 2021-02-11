@@ -67,10 +67,14 @@ public class SmssPage extends JFrame {
 	private String error = null;
 	private HashMap<Integer, ClassType> classTypes;
 
-	public SmssPage() {
+	public SmssPage() throws InvalidInputException {
 		initComponents();
 		refreshData();
-		SsmsController.createSmss();
+		try {
+			SmssController.createSmss();
+		} catch (InvalidInputException e) {
+			error = e.getMessage();
+		}
 	}
 
 	

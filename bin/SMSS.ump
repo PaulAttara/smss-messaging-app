@@ -2,13 +2,13 @@ namespace ca.mcgill.ecse.smss.model;
 
 class SMSS
 {
-  1 <@>- * Method;
-  1 <@>- * ClassType;
+  1 <@>- 0..1 Method;
+  1 <@>- 0..* ClassType;
 }
 
 class SpecificElement 
 {
-  Integer id;
+  autounique id;
   1 -- 0..1 Fragment;
   0..* -- 1 Message;
   0..* -- 1 Method;
@@ -16,13 +16,13 @@ class SpecificElement
 
 class Method 
 {
-  String name;
+  unique String name;
   0..1 -- 1 ClassType;
 }
 
 class ClassType 
 {
-  String name;
+  unique String name;
 }
 
 class Object 
@@ -44,13 +44,14 @@ class ReceiverObject
 
 class SpecificMessage
 {
+  autounique id;
 	0..* -- 1 Message;
 	0..* -- 1 Operand;
 }
 
 class Message 
 {
-  String name;
+  unique String name;
   0..* -- 1 SenderObject;
   0..* -- 1 ReceiverObject;
 }

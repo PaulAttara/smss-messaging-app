@@ -9,6 +9,12 @@ public class ClassType
 {
 
   //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static Map<String, ClassType> classtypesByName = new HashMap<String, ClassType>();
+
+  //------------------------
   // MEMBER VARIABLES
   //------------------------
 
@@ -26,7 +32,10 @@ public class ClassType
 
   public ClassType(String aName, SMSS aSMSS)
   {
-    name = aName;
+    if (!setName(aName))
+    {
+      throw new RuntimeException("Cannot create due to duplicate name. See http://manual.umple.org?RE003ViolationofUniqueness.html");
+    }
     boolean didAddSMSS = setSMSS(aSMSS);
     if (!didAddSMSS)
     {
@@ -42,14 +51,35 @@ public class ClassType
   public boolean setName(String aName)
   {
     boolean wasSet = false;
+    String anOldName = getName();
+    if (anOldName != null && anOldName.equals(aName)) {
+      return true;
+    }
+    if (hasWithName(aName)) {
+      return wasSet;
+    }
     name = aName;
     wasSet = true;
+    if (anOldName != null) {
+      classtypesByName.remove(anOldName);
+    }
+    classtypesByName.put(aName, this);
     return wasSet;
   }
 
   public String getName()
   {
     return name;
+  }
+  /* Code from template attribute_GetUnique */
+  public static ClassType getWithName(String aName)
+  {
+    return classtypesByName.get(aName);
+  }
+  /* Code from template attribute_HasUnique */
+  public static boolean hasWithName(String aName)
+  {
+    return getWithName(aName) != null;
   }
   /* Code from template association_GetOne */
   public SMSS getSMSS()
@@ -215,6 +245,7 @@ public class ClassType
 
   public void delete()
   {
+    classtypesByName.remove(getName());
     SMSS placeholderSMSS = sMSS;
     this.sMSS = null;
     if(placeholderSMSS != null)

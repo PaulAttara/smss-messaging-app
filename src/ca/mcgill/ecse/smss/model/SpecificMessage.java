@@ -9,8 +9,17 @@ public class SpecificMessage
 {
 
   //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static int nextId = 1;
+
+  //------------------------
   // MEMBER VARIABLES
   //------------------------
+
+  //Autounique Attributes
+  private int id;
 
   //SpecificMessage Associations
   private Message message;
@@ -23,6 +32,7 @@ public class SpecificMessage
 
   public SpecificMessage(Message aMessage, Operand aOperand)
   {
+    id = nextId++;
     boolean didAddMessage = setMessage(aMessage);
     if (!didAddMessage)
     {
@@ -39,6 +49,11 @@ public class SpecificMessage
   //------------------------
   // INTERFACE
   //------------------------
+
+  public int getId()
+  {
+    return id;
+  }
   /* Code from template association_GetOne */
   public Message getMessage()
   {
@@ -229,4 +244,12 @@ public class SpecificMessage
     }
   }
 
+
+  public String toString()
+  {
+    return super.toString() + "["+
+            "id" + ":" + getId()+ "]" + System.getProperties().getProperty("line.separator") +
+            "  " + "message = "+(getMessage()!=null?Integer.toHexString(System.identityHashCode(getMessage())):"null") + System.getProperties().getProperty("line.separator") +
+            "  " + "operand = "+(getOperand()!=null?Integer.toHexString(System.identityHashCode(getOperand())):"null");
+  }
 }
