@@ -297,6 +297,10 @@ public class SmssController {
 		return SmssApplication.getSmss().getClassTypes().size() > 0;
 	}
 	
+	public static boolean isReceiverCreated() throws InvalidInputException {
+		return getReceivers().size() > 0;
+	}
+	
 	public static boolean isMessageCreated() throws InvalidInputException {
 		try {
 			return getMessages().size() > 0;
