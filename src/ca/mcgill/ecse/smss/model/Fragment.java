@@ -4,29 +4,45 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 64 "../../../../../SMSS.ump"
+// line 69 "../../../../../SMSS.ump"
 public abstract class Fragment
 {
+
+  //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static int nextId = 1;
 
   //------------------------
   // MEMBER VARIABLES
   //------------------------
 
+  //Autounique Attributes
+  private int id;
+
   //Fragment Associations
   private List<SpecificMessage> specificMessages;
+  private SMSS sMSS;
   private SpecificElement specificElement;
 
   //------------------------
   // CONSTRUCTOR
   //------------------------
 
-  public Fragment(SpecificElement aSpecificElement, SpecificMessage... allSpecificMessages)
+  public Fragment(SMSS aSMSS, SpecificElement aSpecificElement, SpecificMessage... allSpecificMessages)
   {
+    id = nextId++;
     specificMessages = new ArrayList<SpecificMessage>();
     boolean didAddSpecificMessages = setSpecificMessages(allSpecificMessages);
     if (!didAddSpecificMessages)
     {
       throw new RuntimeException("Unable to create Fragment, must have at least 2 specificMessages. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+    }
+    boolean didAddSMSS = setSMSS(aSMSS);
+    if (!didAddSMSS)
+    {
+      throw new RuntimeException("Unable to create fragment due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
     boolean didAddSpecificElement = setSpecificElement(aSpecificElement);
     if (!didAddSpecificElement)
@@ -38,6 +54,11 @@ public abstract class Fragment
   //------------------------
   // INTERFACE
   //------------------------
+
+  public int getId()
+  {
+    return id;
+  }
   /* Code from template association_GetMany */
   public SpecificMessage getSpecificMessage(int index)
   {
@@ -67,6 +88,11 @@ public abstract class Fragment
   {
     int index = specificMessages.indexOf(aSpecificMessage);
     return index;
+  }
+  /* Code from template association_GetOne */
+  public SMSS getSMSS()
+  {
+    return sMSS;
   }
   /* Code from template association_GetOne */
   public SpecificElement getSpecificElement()
@@ -207,6 +233,25 @@ public abstract class Fragment
     }
     return wasAdded;
   }
+  /* Code from template association_SetOneToMany */
+  public boolean setSMSS(SMSS aSMSS)
+  {
+    boolean wasSet = false;
+    if (aSMSS == null)
+    {
+      return wasSet;
+    }
+
+    SMSS existingSMSS = sMSS;
+    sMSS = aSMSS;
+    if (existingSMSS != null && !existingSMSS.equals(aSMSS))
+    {
+      existingSMSS.removeFragment(this);
+    }
+    sMSS.addFragment(this);
+    wasSet = true;
+    return wasSet;
+  }
   /* Code from template association_SetOneToOptionalOne */
   public boolean setSpecificElement(SpecificElement aNewSpecificElement)
   {
@@ -245,6 +290,12 @@ public abstract class Fragment
       specificMessages.remove(aSpecificMessage);
     }
     
+    SMSS placeholderSMSS = sMSS;
+    this.sMSS = null;
+    if(placeholderSMSS != null)
+    {
+      placeholderSMSS.removeFragment(this);
+    }
     SpecificElement existingSpecificElement = specificElement;
     specificElement = null;
     if (existingSpecificElement != null)
@@ -253,4 +304,12 @@ public abstract class Fragment
     }
   }
 
+
+  public String toString()
+  {
+    return super.toString() + "["+
+            "id" + ":" + getId()+ "]" + System.getProperties().getProperty("line.separator") +
+            "  " + "sMSS = "+(getSMSS()!=null?Integer.toHexString(System.identityHashCode(getSMSS())):"null") + System.getProperties().getProperty("line.separator") +
+            "  " + "specificElement = "+(getSpecificElement()!=null?Integer.toHexString(System.identityHashCode(getSpecificElement())):"null");
+  }
 }

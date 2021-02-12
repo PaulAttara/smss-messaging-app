@@ -15,6 +15,8 @@ public class SMSS
   //SMSS Associations
   private Method method;
   private List<ClassType> classTypes;
+  private List<Fragment> fragments;
+  private List<Operand> operands;
 
   //------------------------
   // CONSTRUCTOR
@@ -23,6 +25,8 @@ public class SMSS
   public SMSS()
   {
     classTypes = new ArrayList<ClassType>();
+    fragments = new ArrayList<Fragment>();
+    operands = new ArrayList<Operand>();
   }
 
   //------------------------
@@ -67,6 +71,69 @@ public class SMSS
   public int indexOfClassType(ClassType aClassType)
   {
     int index = classTypes.indexOf(aClassType);
+    return index;
+  }
+  /* Code from template association_GetMany */
+  public Fragment getFragment(int index)
+  {
+    Fragment aFragment = fragments.get(index);
+    return aFragment;
+  }
+
+  public List<Fragment> getFragments()
+  {
+    List<Fragment> newFragments = Collections.unmodifiableList(fragments);
+    return newFragments;
+  }
+
+  public int numberOfFragments()
+  {
+    int number = fragments.size();
+    return number;
+  }
+
+  public boolean hasFragments()
+  {
+    boolean has = fragments.size() > 0;
+    return has;
+  }
+
+  public int indexOfFragment(Fragment aFragment)
+  {
+    int index = fragments.indexOf(aFragment);
+    return index;
+  }
+  /* Code from template association_GetMany */
+  public Operand getOperand(int index)
+  {
+    Operand aOperand = operands.get(index);
+    return aOperand;
+  }
+
+  /**
+   * added this line!!!!
+   */
+  public List<Operand> getOperands()
+  {
+    List<Operand> newOperands = Collections.unmodifiableList(operands);
+    return newOperands;
+  }
+
+  public int numberOfOperands()
+  {
+    int number = operands.size();
+    return number;
+  }
+
+  public boolean hasOperands()
+  {
+    boolean has = operands.size() > 0;
+    return has;
+  }
+
+  public int indexOfOperand(Operand aOperand)
+  {
+    int index = operands.indexOf(aOperand);
     return index;
   }
   /* Code from template association_SetOptionalOneToOne */
@@ -168,6 +235,147 @@ public class SMSS
     }
     return wasAdded;
   }
+  /* Code from template association_MinimumNumberOfMethod */
+  public static int minimumNumberOfFragments()
+  {
+    return 0;
+  }
+  /* Code from template association_AddManyToOne */
+
+
+  public boolean addFragment(Fragment aFragment)
+  {
+    boolean wasAdded = false;
+    if (fragments.contains(aFragment)) { return false; }
+    SMSS existingSMSS = aFragment.getSMSS();
+    boolean isNewSMSS = existingSMSS != null && !this.equals(existingSMSS);
+    if (isNewSMSS)
+    {
+      aFragment.setSMSS(this);
+    }
+    else
+    {
+      fragments.add(aFragment);
+    }
+    wasAdded = true;
+    return wasAdded;
+  }
+
+  public boolean removeFragment(Fragment aFragment)
+  {
+    boolean wasRemoved = false;
+    //Unable to remove aFragment, as it must always have a sMSS
+    if (!this.equals(aFragment.getSMSS()))
+    {
+      fragments.remove(aFragment);
+      wasRemoved = true;
+    }
+    return wasRemoved;
+  }
+  /* Code from template association_AddIndexControlFunctions */
+  public boolean addFragmentAt(Fragment aFragment, int index)
+  {  
+    boolean wasAdded = false;
+    if(addFragment(aFragment))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfFragments()) { index = numberOfFragments() - 1; }
+      fragments.remove(aFragment);
+      fragments.add(index, aFragment);
+      wasAdded = true;
+    }
+    return wasAdded;
+  }
+
+  public boolean addOrMoveFragmentAt(Fragment aFragment, int index)
+  {
+    boolean wasAdded = false;
+    if(fragments.contains(aFragment))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfFragments()) { index = numberOfFragments() - 1; }
+      fragments.remove(aFragment);
+      fragments.add(index, aFragment);
+      wasAdded = true;
+    } 
+    else 
+    {
+      wasAdded = addFragmentAt(aFragment, index);
+    }
+    return wasAdded;
+  }
+  /* Code from template association_MinimumNumberOfMethod */
+  public static int minimumNumberOfOperands()
+  {
+    return 0;
+  }
+  /* Code from template association_AddManyToOne */
+  public Operand addOperand(String aCondition)
+  {
+    return new Operand(aCondition, this);
+  }
+
+  public boolean addOperand(Operand aOperand)
+  {
+    boolean wasAdded = false;
+    if (operands.contains(aOperand)) { return false; }
+    SMSS existingSMSS = aOperand.getSMSS();
+    boolean isNewSMSS = existingSMSS != null && !this.equals(existingSMSS);
+    if (isNewSMSS)
+    {
+      aOperand.setSMSS(this);
+    }
+    else
+    {
+      operands.add(aOperand);
+    }
+    wasAdded = true;
+    return wasAdded;
+  }
+
+  public boolean removeOperand(Operand aOperand)
+  {
+    boolean wasRemoved = false;
+    //Unable to remove aOperand, as it must always have a sMSS
+    if (!this.equals(aOperand.getSMSS()))
+    {
+      operands.remove(aOperand);
+      wasRemoved = true;
+    }
+    return wasRemoved;
+  }
+  /* Code from template association_AddIndexControlFunctions */
+  public boolean addOperandAt(Operand aOperand, int index)
+  {  
+    boolean wasAdded = false;
+    if(addOperand(aOperand))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfOperands()) { index = numberOfOperands() - 1; }
+      operands.remove(aOperand);
+      operands.add(index, aOperand);
+      wasAdded = true;
+    }
+    return wasAdded;
+  }
+
+  public boolean addOrMoveOperandAt(Operand aOperand, int index)
+  {
+    boolean wasAdded = false;
+    if(operands.contains(aOperand))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfOperands()) { index = numberOfOperands() - 1; }
+      operands.remove(aOperand);
+      operands.add(index, aOperand);
+      wasAdded = true;
+    } 
+    else 
+    {
+      wasAdded = addOperandAt(aOperand, index);
+    }
+    return wasAdded;
+  }
 
   public void delete()
   {
@@ -183,6 +391,20 @@ public class SMSS
       ClassType aClassType = classTypes.get(classTypes.size() - 1);
       aClassType.delete();
       classTypes.remove(aClassType);
+    }
+    
+    while (fragments.size() > 0)
+    {
+      Fragment aFragment = fragments.get(fragments.size() - 1);
+      aFragment.delete();
+      fragments.remove(aFragment);
+    }
+    
+    while (operands.size() > 0)
+    {
+      Operand aOperand = operands.get(operands.size() - 1);
+      aOperand.delete();
+      operands.remove(aOperand);
     }
     
   }

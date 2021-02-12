@@ -4,6 +4,10 @@ class SMSS
 {
   1 <@>- 0..1 Method;
   1 <@>- 0..* ClassType;
+  1 <@>- 0..* Fragment;
+  
+  // added this line!!!!
+  1 <@>- 0..* Operand;
 }
 
 class SpecificElement 
@@ -58,12 +62,14 @@ class Message
 }
 class Operand 
 {
+  autounique id;
   String condition;
 }
 
 class Fragment 
 {
   abstract;
+  autounique id;
   0..* <@>- 2..* SpecificMessage;
 }
 class AlternativeFragment 

@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 23 "../../../../../SMSS.ump"
+// line 27 "../../../../../SMSS.ump"
 public class ClassType
 {
 

@@ -4,9 +4,15 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 59 "../../../../../SMSS.ump"
+// line 63 "../../../../../SMSS.ump"
 public class Operand
 {
+
+  //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static int nextId = 1;
 
   //------------------------
   // MEMBER VARIABLES
@@ -15,16 +21,26 @@ public class Operand
   //Operand Attributes
   private String condition;
 
+  //Autounique Attributes
+  private int id;
+
   //Operand Associations
+  private SMSS sMSS;
   private List<SpecificMessage> specificMessages;
 
   //------------------------
   // CONSTRUCTOR
   //------------------------
 
-  public Operand(String aCondition)
+  public Operand(String aCondition, SMSS aSMSS)
   {
     condition = aCondition;
+    id = nextId++;
+    boolean didAddSMSS = setSMSS(aSMSS);
+    if (!didAddSMSS)
+    {
+      throw new RuntimeException("Unable to create operand due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+    }
     specificMessages = new ArrayList<SpecificMessage>();
   }
 
@@ -43,6 +59,16 @@ public class Operand
   public String getCondition()
   {
     return condition;
+  }
+
+  public int getId()
+  {
+    return id;
+  }
+  /* Code from template association_GetOne */
+  public SMSS getSMSS()
+  {
+    return sMSS;
   }
   /* Code from template association_GetMany */
   public SpecificMessage getSpecificMessage(int index)
@@ -73,6 +99,25 @@ public class Operand
   {
     int index = specificMessages.indexOf(aSpecificMessage);
     return index;
+  }
+  /* Code from template association_SetOneToMany */
+  public boolean setSMSS(SMSS aSMSS)
+  {
+    boolean wasSet = false;
+    if (aSMSS == null)
+    {
+      return wasSet;
+    }
+
+    SMSS existingSMSS = sMSS;
+    sMSS = aSMSS;
+    if (existingSMSS != null && !existingSMSS.equals(aSMSS))
+    {
+      existingSMSS.removeOperand(this);
+    }
+    sMSS.addOperand(this);
+    wasSet = true;
+    return wasSet;
   }
   /* Code from template association_MinimumNumberOfMethod */
   public static int minimumNumberOfSpecificMessages()
@@ -149,6 +194,12 @@ public class Operand
 
   public void delete()
   {
+    SMSS placeholderSMSS = sMSS;
+    this.sMSS = null;
+    if(placeholderSMSS != null)
+    {
+      placeholderSMSS.removeOperand(this);
+    }
     for(int i=specificMessages.size(); i > 0; i--)
     {
       SpecificMessage aSpecificMessage = specificMessages.get(i - 1);
@@ -160,6 +211,8 @@ public class Operand
   public String toString()
   {
     return super.toString() + "["+
-            "condition" + ":" + getCondition()+ "]";
+            "id" + ":" + getId()+ "," +
+            "condition" + ":" + getCondition()+ "]" + System.getProperties().getProperty("line.separator") +
+            "  " + "sMSS = "+(getSMSS()!=null?Integer.toHexString(System.identityHashCode(getSMSS())):"null");
   }
 }

@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 17 "../../../../../SMSS.ump"
+// line 21 "../../../../../SMSS.ump"
 public class Method
 {
 
