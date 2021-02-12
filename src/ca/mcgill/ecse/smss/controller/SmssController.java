@@ -318,7 +318,11 @@ public class SmssController {
 	
 	public static boolean hasMessages() throws InvalidInputException {
 		try {
-			return getSenderObject().getMessages().size() > 0;
+			if(getSenderObject() != null && getSenderObject().getMessages().size() > 0) {
+				return true;
+			}else {
+				return false;
+			}
 		} catch (InvalidInputException e) {
 			throw new InvalidInputException(e.getMessage());
 		}
