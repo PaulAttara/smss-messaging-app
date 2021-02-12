@@ -12,14 +12,14 @@ public class ReceiverObject extends Object
   // STATIC VARIABLES
   //------------------------
 
-  private static int nextId = 1;
+  private static Map<String, ReceiverObject> receiverobjectsByName = new HashMap<String, ReceiverObject>();
 
   //------------------------
   // MEMBER VARIABLES
   //------------------------
 
-  //Autounique Attributes
-  private int id;
+  //ReceiverObject Attributes
+  private String name;
 
   //ReceiverObject Associations
   private List<Message> messages;
@@ -28,10 +28,13 @@ public class ReceiverObject extends Object
   // CONSTRUCTOR
   //------------------------
 
-  public ReceiverObject(ClassType aClassType)
+  public ReceiverObject(ClassType aClassType, String aName)
   {
     super(aClassType);
-    id = nextId++;
+    if (!setName(aName))
+    {
+      throw new RuntimeException("Cannot create due to duplicate name. See http://manual.umple.org?RE003ViolationofUniqueness.html");
+    }
     messages = new ArrayList<Message>();
   }
 
@@ -39,9 +42,38 @@ public class ReceiverObject extends Object
   // INTERFACE
   //------------------------
 
-  public int getId()
+  public boolean setName(String aName)
   {
-    return id;
+    boolean wasSet = false;
+    String anOldName = getName();
+    if (anOldName != null && anOldName.equals(aName)) {
+      return true;
+    }
+    if (hasWithName(aName)) {
+      return wasSet;
+    }
+    name = aName;
+    wasSet = true;
+    if (anOldName != null) {
+      receiverobjectsByName.remove(anOldName);
+    }
+    receiverobjectsByName.put(aName, this);
+    return wasSet;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+  /* Code from template attribute_GetUnique */
+  public static ReceiverObject getWithName(String aName)
+  {
+    return receiverobjectsByName.get(aName);
+  }
+  /* Code from template attribute_HasUnique */
+  public static boolean hasWithName(String aName)
+  {
+    return getWithName(aName) != null;
   }
   /* Code from template association_GetMany */
   public Message getMessage(int index)
@@ -148,6 +180,7 @@ public class ReceiverObject extends Object
 
   public void delete()
   {
+    receiverobjectsByName.remove(getName());
     for(int i=messages.size(); i > 0; i--)
     {
       Message aMessage = messages.get(i - 1);
@@ -160,6 +193,6 @@ public class ReceiverObject extends Object
   public String toString()
   {
     return super.toString() + "["+
-            "id" + ":" + getId()+ "]";
+            "name" + ":" + getName()+ "]";
   }
 }

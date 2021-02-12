@@ -44,7 +44,7 @@ class SenderObject
 class ReceiverObject 
 {
   isA Object;
-  autounique id;
+  unique name;
 }
 
 class SpecificMessage
