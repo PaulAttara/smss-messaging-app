@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 58 "../../../../../SMSS.ump"
+// line 59 "../../../../../SMSS.ump"
 public class Operand
 {
 
@@ -12,32 +12,37 @@ public class Operand
   // MEMBER VARIABLES
   //------------------------
 
+  //Operand Attributes
+  private String condition;
+
   //Operand Associations
-  private Condition condition;
   private List<SpecificMessage> specificMessages;
 
   //------------------------
   // CONSTRUCTOR
   //------------------------
 
-  public Operand()
+  public Operand(String aCondition)
   {
+    condition = aCondition;
     specificMessages = new ArrayList<SpecificMessage>();
   }
 
   //------------------------
   // INTERFACE
   //------------------------
-  /* Code from template association_GetOne */
-  public Condition getCondition()
+
+  public boolean setCondition(String aCondition)
   {
-    return condition;
+    boolean wasSet = false;
+    condition = aCondition;
+    wasSet = true;
+    return wasSet;
   }
 
-  public boolean hasCondition()
+  public String getCondition()
   {
-    boolean has = condition != null;
-    return has;
+    return condition;
   }
   /* Code from template association_GetMany */
   public SpecificMessage getSpecificMessage(int index)
@@ -69,42 +74,15 @@ public class Operand
     int index = specificMessages.indexOf(aSpecificMessage);
     return index;
   }
-  /* Code from template association_SetOptionalOneToOne */
-  public boolean setCondition(Condition aNewCondition)
-  {
-    boolean wasSet = false;
-    if (condition != null && !condition.equals(aNewCondition) && equals(condition.getOperand()))
-    {
-      //Unable to setCondition, as existing condition would become an orphan
-      return wasSet;
-    }
-
-    condition = aNewCondition;
-    Operand anOldOperand = aNewCondition != null ? aNewCondition.getOperand() : null;
-
-    if (!this.equals(anOldOperand))
-    {
-      if (anOldOperand != null)
-      {
-        anOldOperand.condition = null;
-      }
-      if (condition != null)
-      {
-        condition.setOperand(this);
-      }
-    }
-    wasSet = true;
-    return wasSet;
-  }
   /* Code from template association_MinimumNumberOfMethod */
   public static int minimumNumberOfSpecificMessages()
   {
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public SpecificMessage addSpecificMessage(Message aMessage)
+  public SpecificMessage addSpecificMessage()
   {
-    return new SpecificMessage(aMessage, this);
+    return new SpecificMessage(this);
   }
 
   public boolean addSpecificMessage(SpecificMessage aSpecificMessage)
@@ -171,13 +149,6 @@ public class Operand
 
   public void delete()
   {
-    Condition existingCondition = condition;
-    condition = null;
-    if (existingCondition != null)
-    {
-      existingCondition.delete();
-      existingCondition.setOperand(null);
-    }
     for(int i=specificMessages.size(); i > 0; i--)
     {
       SpecificMessage aSpecificMessage = specificMessages.get(i - 1);
@@ -185,4 +156,10 @@ public class Operand
     }
   }
 
+
+  public String toString()
+  {
+    return super.toString() + "["+
+            "condition" + ":" + getCondition()+ "]";
+  }
 }

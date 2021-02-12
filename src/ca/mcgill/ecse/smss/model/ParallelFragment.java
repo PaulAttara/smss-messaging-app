@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 74 "../../../../../SMSS.ump"
+// line 73 "../../../../../SMSS.ump"
 public class ParallelFragment extends Fragment
 {
 

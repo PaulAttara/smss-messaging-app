@@ -9,8 +9,17 @@ public class ReceiverObject extends Object
 {
 
   //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static int nextId = 1;
+
+  //------------------------
   // MEMBER VARIABLES
   //------------------------
+
+  //Autounique Attributes
+  private int id;
 
   //ReceiverObject Associations
   private List<Message> messages;
@@ -22,12 +31,18 @@ public class ReceiverObject extends Object
   public ReceiverObject(ClassType aClassType)
   {
     super(aClassType);
+    id = nextId++;
     messages = new ArrayList<Message>();
   }
 
   //------------------------
   // INTERFACE
   //------------------------
+
+  public int getId()
+  {
+    return id;
+  }
   /* Code from template association_GetMany */
   public Message getMessage(int index)
   {
@@ -141,4 +156,10 @@ public class ReceiverObject extends Object
     super.delete();
   }
 
+
+  public String toString()
+  {
+    return super.toString() + "["+
+            "id" + ":" + getId()+ "]";
+  }
 }

@@ -188,9 +188,9 @@ public class Method
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public SpecificElement addSpecificElement(Message aMessage)
+  public SpecificElement addSpecificElement()
   {
-    return new SpecificElement(aMessage, this);
+    return new SpecificElement(this);
   }
 
   public boolean addSpecificElement(SpecificElement aSpecificElement)

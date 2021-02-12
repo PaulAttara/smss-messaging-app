@@ -29,14 +29,9 @@ public class SpecificElement
   // CONSTRUCTOR
   //------------------------
 
-  public SpecificElement(Message aMessage, Method aMethod)
+  public SpecificElement(Method aMethod)
   {
     id = nextId++;
-    boolean didAddMessage = setMessage(aMessage);
-    if (!didAddMessage)
-    {
-      throw new RuntimeException("Unable to create specificElement due to message. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
-    }
     boolean didAddMethod = setMethod(aMethod);
     if (!didAddMethod)
     {
@@ -67,6 +62,12 @@ public class SpecificElement
   public Message getMessage()
   {
     return message;
+  }
+
+  public boolean hasMessage()
+  {
+    boolean has = message != null;
+    return has;
   }
   /* Code from template association_GetOne */
   public Method getMethod()
@@ -100,22 +101,20 @@ public class SpecificElement
     wasSet = true;
     return wasSet;
   }
-  /* Code from template association_SetOneToMany */
+  /* Code from template association_SetOptionalOneToMany */
   public boolean setMessage(Message aMessage)
   {
     boolean wasSet = false;
-    if (aMessage == null)
-    {
-      return wasSet;
-    }
-
     Message existingMessage = message;
     message = aMessage;
     if (existingMessage != null && !existingMessage.equals(aMessage))
     {
       existingMessage.removeSpecificElement(this);
     }
-    message.addSpecificElement(this);
+    if (aMessage != null)
+    {
+      aMessage.addSpecificElement(this);
+    }
     wasSet = true;
     return wasSet;
   }
@@ -147,10 +146,10 @@ public class SpecificElement
     {
       existingFragment.delete();
     }
-    Message placeholderMessage = message;
-    this.message = null;
-    if(placeholderMessage != null)
+    if (message != null)
     {
+      Message placeholderMessage = message;
+      this.message = null;
       placeholderMessage.removeSpecificElement(this);
     }
     Method placeholderMethod = method;
