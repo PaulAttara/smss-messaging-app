@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 17 "../../../../../SMSS.ump"
+// line 21 "../../../../../SMSS.ump"
 public class Method
 {
 
@@ -188,9 +188,9 @@ public class Method
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public SpecificElement addSpecificElement(Message aMessage)
+  public SpecificElement addSpecificElement()
   {
-    return new SpecificElement(aMessage, this);
+    return new SpecificElement(this);
   }
 
   public boolean addSpecificElement(SpecificElement aSpecificElement)

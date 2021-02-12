@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 52 "../../../../../SMSS.ump"
+// line 57 "../../../../../SMSS.ump"
 public class Message
 {
 
@@ -201,21 +201,20 @@ public class Message
   {
     return 0;
   }
-  /* Code from template association_AddManyToOne */
-  public SpecificElement addSpecificElement(Method aMethod)
-  {
-    return new SpecificElement(this, aMethod);
-  }
-
+  /* Code from template association_AddManyToOptionalOne */
   public boolean addSpecificElement(SpecificElement aSpecificElement)
   {
     boolean wasAdded = false;
     if (specificElements.contains(aSpecificElement)) { return false; }
     Message existingMessage = aSpecificElement.getMessage();
-    boolean isNewMessage = existingMessage != null && !this.equals(existingMessage);
-    if (isNewMessage)
+    if (existingMessage == null)
     {
       aSpecificElement.setMessage(this);
+    }
+    else if (!this.equals(existingMessage))
+    {
+      existingMessage.removeSpecificElement(aSpecificElement);
+      addSpecificElement(aSpecificElement);
     }
     else
     {
@@ -228,10 +227,10 @@ public class Message
   public boolean removeSpecificElement(SpecificElement aSpecificElement)
   {
     boolean wasRemoved = false;
-    //Unable to remove aSpecificElement, as it must always have a message
-    if (!this.equals(aSpecificElement.getMessage()))
+    if (specificElements.contains(aSpecificElement))
     {
       specificElements.remove(aSpecificElement);
+      aSpecificElement.setMessage(null);
       wasRemoved = true;
     }
     return wasRemoved;
@@ -273,21 +272,20 @@ public class Message
   {
     return 0;
   }
-  /* Code from template association_AddManyToOne */
-  public SpecificMessage addSpecificMessage(Operand aOperand)
-  {
-    return new SpecificMessage(this, aOperand);
-  }
-
+  /* Code from template association_AddManyToOptionalOne */
   public boolean addSpecificMessage(SpecificMessage aSpecificMessage)
   {
     boolean wasAdded = false;
     if (specificMessages.contains(aSpecificMessage)) { return false; }
     Message existingMessage = aSpecificMessage.getMessage();
-    boolean isNewMessage = existingMessage != null && !this.equals(existingMessage);
-    if (isNewMessage)
+    if (existingMessage == null)
     {
       aSpecificMessage.setMessage(this);
+    }
+    else if (!this.equals(existingMessage))
+    {
+      existingMessage.removeSpecificMessage(aSpecificMessage);
+      addSpecificMessage(aSpecificMessage);
     }
     else
     {
@@ -300,10 +298,10 @@ public class Message
   public boolean removeSpecificMessage(SpecificMessage aSpecificMessage)
   {
     boolean wasRemoved = false;
-    //Unable to remove aSpecificMessage, as it must always have a message
-    if (!this.equals(aSpecificMessage.getMessage()))
+    if (specificMessages.contains(aSpecificMessage))
     {
       specificMessages.remove(aSpecificMessage);
+      aSpecificMessage.setMessage(null);
       wasRemoved = true;
     }
     return wasRemoved;
@@ -356,15 +354,13 @@ public class Message
     {
       placeholderReceiverObject.removeMessage(this);
     }
-    for(int i=specificElements.size(); i > 0; i--)
+    while( !specificElements.isEmpty() )
     {
-      SpecificElement aSpecificElement = specificElements.get(i - 1);
-      aSpecificElement.delete();
+      specificElements.get(0).setMessage(null);
     }
-    for(int i=specificMessages.size(); i > 0; i--)
+    while( !specificMessages.isEmpty() )
     {
-      SpecificMessage aSpecificMessage = specificMessages.get(i - 1);
-      aSpecificMessage.delete();
+      specificMessages.get(0).setMessage(null);
     }
   }
 

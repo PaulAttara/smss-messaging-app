@@ -4,40 +4,71 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 58 "../../../../../SMSS.ump"
+// line 63 "../../../../../SMSS.ump"
 public class Operand
 {
+
+  //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static int nextId = 1;
 
   //------------------------
   // MEMBER VARIABLES
   //------------------------
 
+  //Operand Attributes
+  private String condition;
+
+  //Autounique Attributes
+  private int id;
+
   //Operand Associations
-  private Condition condition;
+  private SMSS sMSS;
   private List<SpecificMessage> specificMessages;
 
   //------------------------
   // CONSTRUCTOR
   //------------------------
 
-  public Operand()
+  public Operand(String aCondition, SMSS aSMSS)
   {
+    condition = aCondition;
+    id = nextId++;
+    boolean didAddSMSS = setSMSS(aSMSS);
+    if (!didAddSMSS)
+    {
+      throw new RuntimeException("Unable to create operand due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+    }
     specificMessages = new ArrayList<SpecificMessage>();
   }
 
   //------------------------
   // INTERFACE
   //------------------------
-  /* Code from template association_GetOne */
-  public Condition getCondition()
+
+  public boolean setCondition(String aCondition)
+  {
+    boolean wasSet = false;
+    condition = aCondition;
+    wasSet = true;
+    return wasSet;
+  }
+
+  public String getCondition()
   {
     return condition;
   }
 
-  public boolean hasCondition()
+  public int getId()
   {
-    boolean has = condition != null;
-    return has;
+    return id;
+  }
+  /* Code from template association_GetOne */
+  public SMSS getSMSS()
+  {
+    return sMSS;
   }
   /* Code from template association_GetMany */
   public SpecificMessage getSpecificMessage(int index)
@@ -69,30 +100,22 @@ public class Operand
     int index = specificMessages.indexOf(aSpecificMessage);
     return index;
   }
-  /* Code from template association_SetOptionalOneToOne */
-  public boolean setCondition(Condition aNewCondition)
+  /* Code from template association_SetOneToMany */
+  public boolean setSMSS(SMSS aSMSS)
   {
     boolean wasSet = false;
-    if (condition != null && !condition.equals(aNewCondition) && equals(condition.getOperand()))
+    if (aSMSS == null)
     {
-      //Unable to setCondition, as existing condition would become an orphan
       return wasSet;
     }
 
-    condition = aNewCondition;
-    Operand anOldOperand = aNewCondition != null ? aNewCondition.getOperand() : null;
-
-    if (!this.equals(anOldOperand))
+    SMSS existingSMSS = sMSS;
+    sMSS = aSMSS;
+    if (existingSMSS != null && !existingSMSS.equals(aSMSS))
     {
-      if (anOldOperand != null)
-      {
-        anOldOperand.condition = null;
-      }
-      if (condition != null)
-      {
-        condition.setOperand(this);
-      }
+      existingSMSS.removeOperand(this);
     }
+    sMSS.addOperand(this);
     wasSet = true;
     return wasSet;
   }
@@ -102,9 +125,9 @@ public class Operand
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public SpecificMessage addSpecificMessage(Message aMessage)
+  public SpecificMessage addSpecificMessage()
   {
-    return new SpecificMessage(aMessage, this);
+    return new SpecificMessage(this);
   }
 
   public boolean addSpecificMessage(SpecificMessage aSpecificMessage)
@@ -171,12 +194,11 @@ public class Operand
 
   public void delete()
   {
-    Condition existingCondition = condition;
-    condition = null;
-    if (existingCondition != null)
+    SMSS placeholderSMSS = sMSS;
+    this.sMSS = null;
+    if(placeholderSMSS != null)
     {
-      existingCondition.delete();
-      existingCondition.setOperand(null);
+      placeholderSMSS.removeOperand(this);
     }
     for(int i=specificMessages.size(); i > 0; i--)
     {
@@ -185,4 +207,12 @@ public class Operand
     }
   }
 
+
+  public String toString()
+  {
+    return super.toString() + "["+
+            "id" + ":" + getId()+ "," +
+            "condition" + ":" + getCondition()+ "]" + System.getProperties().getProperty("line.separator") +
+            "  " + "sMSS = "+(getSMSS()!=null?Integer.toHexString(System.identityHashCode(getSMSS())):"null");
+  }
 }

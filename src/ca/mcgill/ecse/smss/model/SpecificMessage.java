@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 45 "../../../../../SMSS.ump"
+// line 50 "../../../../../SMSS.ump"
 public class SpecificMessage
 {
 
@@ -30,14 +30,9 @@ public class SpecificMessage
   // CONSTRUCTOR
   //------------------------
 
-  public SpecificMessage(Message aMessage, Operand aOperand)
+  public SpecificMessage(Operand aOperand)
   {
     id = nextId++;
-    boolean didAddMessage = setMessage(aMessage);
-    if (!didAddMessage)
-    {
-      throw new RuntimeException("Unable to create specificMessage due to message. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
-    }
     boolean didAddOperand = setOperand(aOperand);
     if (!didAddOperand)
     {
@@ -58,6 +53,12 @@ public class SpecificMessage
   public Message getMessage()
   {
     return message;
+  }
+
+  public boolean hasMessage()
+  {
+    boolean has = message != null;
+    return has;
   }
   /* Code from template association_GetOne */
   public Operand getOperand()
@@ -94,22 +95,20 @@ public class SpecificMessage
     int index = fragments.indexOf(aFragment);
     return index;
   }
-  /* Code from template association_SetOneToMany */
+  /* Code from template association_SetOptionalOneToMany */
   public boolean setMessage(Message aMessage)
   {
     boolean wasSet = false;
-    if (aMessage == null)
-    {
-      return wasSet;
-    }
-
     Message existingMessage = message;
     message = aMessage;
     if (existingMessage != null && !existingMessage.equals(aMessage))
     {
       existingMessage.removeSpecificMessage(this);
     }
-    message.addSpecificMessage(this);
+    if (aMessage != null)
+    {
+      aMessage.addSpecificMessage(this);
+    }
     wasSet = true;
     return wasSet;
   }
@@ -217,10 +216,10 @@ public class SpecificMessage
 
   public void delete()
   {
-    Message placeholderMessage = message;
-    this.message = null;
-    if(placeholderMessage != null)
+    if (message != null)
     {
+      Message placeholderMessage = message;
+      this.message = null;
       placeholderMessage.removeSpecificMessage(this);
     }
     Operand placeholderOperand = operand;

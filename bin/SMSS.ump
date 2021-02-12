@@ -4,13 +4,17 @@ class SMSS
 {
   1 <@>- 0..1 Method;
   1 <@>- 0..* ClassType;
+  1 <@>- 0..* Fragment;
+  
+  // added this line!!!!
+  1 <@>- 0..* Operand;
 }
 
 class SpecificElement 
 {
   autounique id;
   1 -- 0..1 Fragment;
-  0..* -- 1 Message;
+  0..* -- 0..1 Message;
   0..* -- 1 Method;
 }
 
@@ -29,7 +33,7 @@ class Object
 {
   abstract;
   0..* -- 1 ClassType;
-}`
+}
 
 class SenderObject 
 {
@@ -40,12 +44,13 @@ class SenderObject
 class ReceiverObject 
 {
   isA Object;
+  autounique id;
 }
 
 class SpecificMessage
 {
   autounique id;
-	0..* -- 1 Message;
+	0..* -- 0..1 Message;
 	0..* -- 1 Operand;
 }
 
@@ -57,14 +62,14 @@ class Message
 }
 class Operand 
 {
-  1 <@>- 0..1 Condition;
+  autounique id;
+  String condition;
 }
-class Condition 
-{
-}
+
 class Fragment 
 {
   abstract;
+  autounique id;
   0..* <@>- 2..* SpecificMessage;
 }
 class AlternativeFragment 
