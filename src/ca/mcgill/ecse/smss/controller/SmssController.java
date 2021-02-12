@@ -288,6 +288,31 @@ public class SmssController {
 	}
 	
 	
+	// CHECKERS--------------------------------------------------------------------------------------------------------------------------------
+	public static boolean isMethodCreated() {
+		return SmssApplication.getSmss().hasMethod();	
+	}
+	
+	public static boolean isSenderCreated() {
+		return SmssApplication.getSmss().getClassTypes().size() > 0;
+	}
+	
+	public static boolean isMessageCreated() throws InvalidInputException {
+		try {
+			return getMessages().size() > 0;
+		} catch (InvalidInputException e) {
+			throw new InvalidInputException(e.getMessage());
+		}
+	}
+	
+	public static boolean isOperandCreated() {
+		return SmssApplication.getSmss().getOperands().size() > 0;
+	}
+	
+	public static boolean isFragmentCreated() {
+		return SmssApplication.getSmss().getFragments().size() > 0;
+	}
+	
 	
 	
 	
