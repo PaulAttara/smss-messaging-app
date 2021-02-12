@@ -233,7 +233,7 @@ public class SmssController {
 		return null;
 		
 	}
-	private static ClassType getClassTypeByName(String className) {
+	public static ClassType getClassTypeByName(String className) {
 		for(ClassType type : SmssApplication.getSmss().getClassTypes()) {
 			if(type.getName() == className) {
 				return type;

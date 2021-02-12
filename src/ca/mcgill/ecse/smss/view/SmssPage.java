@@ -602,7 +602,6 @@ public class SmssPage extends JFrame {
 		
 		// call the controller
 		try {
-			System.out.print(classTextField.getText() + " Class text");
 			if(classTextField.getText().equals("")) {
 				throw(new InvalidInputException("Class Name cannot be empty"));
 			}else {
@@ -622,11 +621,11 @@ public class SmssPage extends JFrame {
 		
 		// call the controller
 		try {
-			System.out.print(receiverTextField.getText() + " Class text");
 			if(classTextField.getText().equals("")) {
 				throw(new InvalidInputException("Receiver name cannot be empty"));
 			}else {
-				SmssController.createReceiver(receiverTextField.getText());
+				ClassType classType = SmssController.getClassTypeByName(classes.get(selectedClassType2).getName());
+				SmssController.createReceiver(receiverTextField.getText(), classType.getName());
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
