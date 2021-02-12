@@ -27,7 +27,9 @@ import javax.swing.table.TableCellRenderer;
 
 import ca.mcgill.ecse.smss.controller.SmssController;
 import ca.mcgill.ecse.smss.model.SMSS;
+import ca.mcgill.ecse.smss.model.SenderObject;
 import ca.mcgill.ecse.smss.model.ClassType;
+import ca.mcgill.ecse.smss.model.Message;
 import ca.mcgill.ecse.smss.model.ReceiverObject;
 import ca.mcgill.ecse.smss.application.SmssApplication;
 import ca.mcgill.ecse.smss.controller.InvalidInputException;
@@ -126,9 +128,7 @@ public class SmssPage extends JFrame {
 		emptyLabel = new JLabel();
 		
 		 listModel = new DefaultListModel<String>();
-	     listModel.addElement("Jane Doe");
-	     listModel.addElement("John Smith");
-	     listModel.addElement("Kathy Green");
+	     
 		
 		
 		// elements for smss
@@ -265,7 +265,7 @@ public class SmssPage extends JFrame {
 		createReceiverButton.setText("Create Receiver");
 		createReceiverButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				createClassButtonActionPerformed(evt);
+				createReceiverButtonActionPerformed(evt);
 			}
 		});
 
@@ -274,7 +274,7 @@ public class SmssPage extends JFrame {
 		createMessageButton.setText("Create Message");
 		createMessageButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				createClassButtonActionPerformed(evt);
+				createMessageButtonActionPerformed(evt);
 			}
 		});		
 
@@ -283,7 +283,7 @@ public class SmssPage extends JFrame {
 		createOperandButton.setText("Create Operand");
 		createOperandButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				createClassButtonActionPerformed(evt);
+				createOperandButtonActionPerformed(evt);
 			}
 		});		
 
@@ -292,7 +292,7 @@ public class SmssPage extends JFrame {
 		createFragmentButton.setText("Create Fragment");
 		createFragmentButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				createClassButtonActionPerformed(evt);
+				createFragmentButtonActionPerformed(evt);
 			}
 		});		
 		
@@ -497,7 +497,13 @@ public class SmssPage extends JFrame {
 				selectedReceiver2 = -1;
 				receiverDropdown1.setSelectedIndex(selectedClassType1);
 				receiverDropdown2.setSelectedIndex(selectedClassType2);
-
+			}
+			
+			if(SmssController.hasMessages()) {
+				for (Message message : SmssController.getMessages()) {
+					listModel.addElement(message.getName());
+				};
+		        messageList1.setSelectedIndex(-1);
 			}
 			
 		}
@@ -625,7 +631,67 @@ public class SmssPage extends JFrame {
 				throw(new InvalidInputException("Receiver name cannot be empty"));
 			}else {
 				ClassType classType = SmssController.getClassTypeByName(classes.get(selectedClassType2).getName());
-				SmssController.createReceiver(receiverTextField.getText(), classType.getName());
+				//SmssController.createReceiver(receiverTextField.getText(), classType.getName());
+			}
+		} catch (InvalidInputException e) {
+			error = e.getMessage();
+		}
+
+		// update visuals
+		refreshData();
+	}
+	
+	private void createMessageButtonActionPerformed(ActionEvent evt) {
+		// clear error message	
+		error = null;
+		
+		// call the controller
+		try {
+			if(messageTextfield.getText().equals("")) {
+				throw(new InvalidInputException("Message name cannot be empty"));
+			}else {
+				ReceiverObject receiverObj = SmssController.getReceiverById(receivers.get(selectedReceiver1).getId());
+				SmssController.createMessage(messageTextfield.getText(), receiverObj.getId());
+			}
+		} catch (InvalidInputException e) {
+			error = e.getMessage();
+		}
+
+		// update visuals
+		refreshData();
+	}
+	
+	private void createOperandButtonActionPerformed(ActionEvent evt) {
+		// clear error message	
+		error = null;
+		
+		// call the controller
+		try {
+			if(operandCondition.getText().equals("")) {
+				throw(new InvalidInputException("Message name cannot be empty"));
+			}else {
+				ReceiverObject receiverObj = SmssController.getReceiverById(receivers.get(selectedReceiver1).getId());
+				SmssController.createMessage(messageTextfield.getText(), receiverObj.getId());
+			}
+		} catch (InvalidInputException e) {
+			error = e.getMessage();
+		}
+
+		// update visuals
+		refreshData();
+	}
+	
+	private void createFragmentButtonActionPerformed(ActionEvent evt) {
+		// clear error message	
+		error = null;
+		
+		// call the controller
+		try {
+			if(messageTextfield.getText().equals("")) {
+				throw(new InvalidInputException("Message name cannot be empty"));
+			}else {
+				ReceiverObject receiverObj = SmssController.getReceiverById(receivers.get(selectedReceiver1).getId());
+				SmssController.createMessage(messageTextfield.getText(), receiverObj.getId());
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();

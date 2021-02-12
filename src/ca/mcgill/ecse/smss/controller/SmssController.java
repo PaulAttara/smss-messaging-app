@@ -316,6 +316,14 @@ public class SmssController {
 		}
 	}
 	
+	public static boolean hasMessages() throws InvalidInputException {
+		try {
+			return getSenderObject().getMessages().size() > 0;
+		} catch (InvalidInputException e) {
+			throw new InvalidInputException(e.getMessage());
+		}
+	}
+	
 	// MAYBE COMPOSITION FROM SMSS TO OPERAND!! TO AVOID ALL THIS CODE
 	public static List<Operand> getOperands() {
 		List<Operand> operands = new ArrayList<Operand>();
