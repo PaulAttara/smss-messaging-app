@@ -163,11 +163,20 @@ public class SmssController {
 	
 	// GETTERS--------------------------------------------------------------------------------------------------------------------------------
 
+	public static String getSmssClass(int index) {
+		return SmssApplication.getSmss().getClassType(index).getName();
+	}
+	
+	public static boolean hasMethod() {
+		return SmssApplication.getSmss().hasMethod();
+	}
+	
 	public static String getMethodName() {
 		return SmssApplication.getSmss().getMethod().getName();
 	}
 	public static SenderObject getSenderObject() throws InvalidInputException {
 		// get all objects
+		if(SmssController.getClassTypes().size() > 0) {
 		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
 		
 		SenderObject sender = null;
@@ -180,7 +189,30 @@ public class SmssController {
 		if(sender != null) {
 			return sender;
 		}
-		return null;	
+		return null;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public static boolean hasSenderObject() throws InvalidInputException {
+		// get all objects
+		if(SmssController.getClassTypes().size() > 0) {
+		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
+		
+		// find sender object
+		for(Object o : objects) {
+			if(o instanceof SenderObject) {
+				return true;
+			}
+		}
+		
+		return false;	
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public static String getSenderName() throws InvalidInputException {
@@ -210,9 +242,15 @@ public class SmssController {
 		return null;
 	}
 
+	public static boolean hasClassTypes() {
+		return SmssApplication.getSmss().getClassTypes().size() > 0;
+	}
+	
+	
 	public static List<ClassType> getClassTypes() {
 		return SmssApplication.getSmss().getClassTypes();
 	}
+	
 	// this method is used for testing, not needed for ui, use the other getReceivers for ui
 	public static List<ReceiverObject> getReceiversNonHash() { 
 		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
@@ -227,7 +265,25 @@ public class SmssController {
 		}
 		return receivers;
 	}
+	
+	public static boolean hasReceivers() {
+		if(SmssController.getClassTypes().size() > 0) {
+		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
+				
+		for(Object r : objects) {
+			if(r instanceof ReceiverObject) {
+				return true;
+			}
+		}
+		return false;
+		}
+		else {
+			return false;
+		}
+	}
+	
 	public static HashMap<Integer, ReceiverObject> getReceivers() {
+		
 		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
 		
 		HashMap<Integer, ReceiverObject> receivers = new HashMap<>();
