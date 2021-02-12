@@ -289,6 +289,10 @@ public class SmssController {
 	
 	
 	// CHECKERS--------------------------------------------------------------------------------------------------------------------------------
+	public static boolean isMainClassCreated() {
+		return SmssApplication.getSmss().getClassTypes().size() > 0;	
+	}
+	
 	public static boolean isMethodCreated() {
 		return SmssApplication.getSmss().hasMethod();	
 	}
