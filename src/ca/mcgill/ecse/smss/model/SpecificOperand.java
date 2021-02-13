@@ -4,8 +4,8 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 51 "../../../../../SMSS.ump"
-public class SpecificMessage
+// line 50 "../../../../../SMSS.ump"
+public class SpecificOperand
 {
 
   //------------------------
@@ -21,7 +21,7 @@ public class SpecificMessage
   //Autounique Attributes
   private int id;
 
-  //SpecificMessage Associations
+  //SpecificOperand Associations
   private Message message;
   private Operand operand;
   private List<Fragment> fragments;
@@ -30,13 +30,13 @@ public class SpecificMessage
   // CONSTRUCTOR
   //------------------------
 
-  public SpecificMessage(Operand aOperand)
+  public SpecificOperand(Operand aOperand)
   {
     id = nextId++;
     boolean didAddOperand = setOperand(aOperand);
     if (!didAddOperand)
     {
-      throw new RuntimeException("Unable to create specificMessage due to operand. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+      throw new RuntimeException("Unable to create specificOperand due to operand. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
     fragments = new ArrayList<Fragment>();
   }
@@ -103,11 +103,11 @@ public class SpecificMessage
     message = aMessage;
     if (existingMessage != null && !existingMessage.equals(aMessage))
     {
-      existingMessage.removeSpecificMessage(this);
+      existingMessage.removeSpecificOperand(this);
     }
     if (aMessage != null)
     {
-      aMessage.addSpecificMessage(this);
+      aMessage.addSpecificOperand(this);
     }
     wasSet = true;
     return wasSet;
@@ -125,9 +125,9 @@ public class SpecificMessage
     operand = aOperand;
     if (existingOperand != null && !existingOperand.equals(aOperand))
     {
-      existingOperand.removeSpecificMessage(this);
+      existingOperand.removeSpecificOperand(this);
     }
-    operand.addSpecificMessage(this);
+    operand.addSpecificOperand(this);
     wasSet = true;
     return wasSet;
   }
@@ -142,13 +142,13 @@ public class SpecificMessage
     boolean wasAdded = false;
     if (fragments.contains(aFragment)) { return false; }
     fragments.add(aFragment);
-    if (aFragment.indexOfSpecificMessage(this) != -1)
+    if (aFragment.indexOfSpecificOperand(this) != -1)
     {
       wasAdded = true;
     }
     else
     {
-      wasAdded = aFragment.addSpecificMessage(this);
+      wasAdded = aFragment.addSpecificOperand(this);
       if (!wasAdded)
       {
         fragments.remove(aFragment);
@@ -167,13 +167,13 @@ public class SpecificMessage
 
     int oldIndex = fragments.indexOf(aFragment);
     fragments.remove(oldIndex);
-    if (aFragment.indexOfSpecificMessage(this) == -1)
+    if (aFragment.indexOfSpecificOperand(this) == -1)
     {
       wasRemoved = true;
     }
     else
     {
-      wasRemoved = aFragment.removeSpecificMessage(this);
+      wasRemoved = aFragment.removeSpecificOperand(this);
       if (!wasRemoved)
       {
         fragments.add(oldIndex,aFragment);
@@ -220,25 +220,25 @@ public class SpecificMessage
     {
       Message placeholderMessage = message;
       this.message = null;
-      placeholderMessage.removeSpecificMessage(this);
+      placeholderMessage.removeSpecificOperand(this);
     }
     Operand placeholderOperand = operand;
     this.operand = null;
     if(placeholderOperand != null)
     {
-      placeholderOperand.removeSpecificMessage(this);
+      placeholderOperand.removeSpecificOperand(this);
     }
     ArrayList<Fragment> copyOfFragments = new ArrayList<Fragment>(fragments);
     fragments.clear();
     for(Fragment aFragment : copyOfFragments)
     {
-      if (aFragment.numberOfSpecificMessages() <= Fragment.minimumNumberOfSpecificMessages())
+      if (aFragment.numberOfSpecificOperands() <= Fragment.minimumNumberOfSpecificOperands())
       {
         aFragment.delete();
       }
       else
       {
-        aFragment.removeSpecificMessage(this);
+        aFragment.removeSpecificOperand(this);
       }
     }
   }

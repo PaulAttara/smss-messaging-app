@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 70 "../../../../../SMSS.ump"
+// line 69 "../../../../../SMSS.ump"
 public abstract class Fragment
 {
 
@@ -22,7 +22,7 @@ public abstract class Fragment
   private int id;
 
   //Fragment Associations
-  private List<SpecificMessage> specificMessages;
+  private List<SpecificOperand> specificOperands;
   private SMSS sMSS;
   private SpecificElement specificElement;
 
@@ -30,14 +30,14 @@ public abstract class Fragment
   // CONSTRUCTOR
   //------------------------
 
-  public Fragment(SMSS aSMSS, SpecificElement aSpecificElement, SpecificMessage... allSpecificMessages)
+  public Fragment(SMSS aSMSS, SpecificElement aSpecificElement, SpecificOperand... allSpecificOperands)
   {
     id = nextId++;
-    specificMessages = new ArrayList<SpecificMessage>();
-    boolean didAddSpecificMessages = setSpecificMessages(allSpecificMessages);
-    if (!didAddSpecificMessages)
+    specificOperands = new ArrayList<SpecificOperand>();
+    boolean didAddSpecificOperands = setSpecificOperands(allSpecificOperands);
+    if (!didAddSpecificOperands)
     {
-      throw new RuntimeException("Unable to create Fragment, must have at least 2 specificMessages. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+      throw new RuntimeException("Unable to create Fragment, must have at least 2 specificOperands. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
     boolean didAddSMSS = setSMSS(aSMSS);
     if (!didAddSMSS)
@@ -60,33 +60,33 @@ public abstract class Fragment
     return id;
   }
   /* Code from template association_GetMany */
-  public SpecificMessage getSpecificMessage(int index)
+  public SpecificOperand getSpecificOperand(int index)
   {
-    SpecificMessage aSpecificMessage = specificMessages.get(index);
-    return aSpecificMessage;
+    SpecificOperand aSpecificOperand = specificOperands.get(index);
+    return aSpecificOperand;
   }
 
-  public List<SpecificMessage> getSpecificMessages()
+  public List<SpecificOperand> getSpecificOperands()
   {
-    List<SpecificMessage> newSpecificMessages = Collections.unmodifiableList(specificMessages);
-    return newSpecificMessages;
+    List<SpecificOperand> newSpecificOperands = Collections.unmodifiableList(specificOperands);
+    return newSpecificOperands;
   }
 
-  public int numberOfSpecificMessages()
+  public int numberOfSpecificOperands()
   {
-    int number = specificMessages.size();
+    int number = specificOperands.size();
     return number;
   }
 
-  public boolean hasSpecificMessages()
+  public boolean hasSpecificOperands()
   {
-    boolean has = specificMessages.size() > 0;
+    boolean has = specificOperands.size() > 0;
     return has;
   }
 
-  public int indexOfSpecificMessage(SpecificMessage aSpecificMessage)
+  public int indexOfSpecificOperand(SpecificOperand aSpecificOperand)
   {
-    int index = specificMessages.indexOf(aSpecificMessage);
+    int index = specificOperands.indexOf(aSpecificOperand);
     return index;
   }
   /* Code from template association_GetOne */
@@ -100,136 +100,136 @@ public abstract class Fragment
     return specificElement;
   }
   /* Code from template association_IsNumberOfValidMethod */
-  public boolean isNumberOfSpecificMessagesValid()
+  public boolean isNumberOfSpecificOperandsValid()
   {
-    boolean isValid = numberOfSpecificMessages() >= minimumNumberOfSpecificMessages();
+    boolean isValid = numberOfSpecificOperands() >= minimumNumberOfSpecificOperands();
     return isValid;
   }
   /* Code from template association_MinimumNumberOfMethod */
-  public static int minimumNumberOfSpecificMessages()
+  public static int minimumNumberOfSpecificOperands()
   {
     return 2;
   }
   /* Code from template association_AddManyToManyMethod */
-  public boolean addSpecificMessage(SpecificMessage aSpecificMessage)
+  public boolean addSpecificOperand(SpecificOperand aSpecificOperand)
   {
     boolean wasAdded = false;
-    if (specificMessages.contains(aSpecificMessage)) { return false; }
-    specificMessages.add(aSpecificMessage);
-    if (aSpecificMessage.indexOfFragment(this) != -1)
+    if (specificOperands.contains(aSpecificOperand)) { return false; }
+    specificOperands.add(aSpecificOperand);
+    if (aSpecificOperand.indexOfFragment(this) != -1)
     {
       wasAdded = true;
     }
     else
     {
-      wasAdded = aSpecificMessage.addFragment(this);
+      wasAdded = aSpecificOperand.addFragment(this);
       if (!wasAdded)
       {
-        specificMessages.remove(aSpecificMessage);
+        specificOperands.remove(aSpecificOperand);
       }
     }
     return wasAdded;
   }
   /* Code from template association_AddMStarToMany */
-  public boolean removeSpecificMessage(SpecificMessage aSpecificMessage)
+  public boolean removeSpecificOperand(SpecificOperand aSpecificOperand)
   {
     boolean wasRemoved = false;
-    if (!specificMessages.contains(aSpecificMessage))
+    if (!specificOperands.contains(aSpecificOperand))
     {
       return wasRemoved;
     }
 
-    if (numberOfSpecificMessages() <= minimumNumberOfSpecificMessages())
+    if (numberOfSpecificOperands() <= minimumNumberOfSpecificOperands())
     {
       return wasRemoved;
     }
 
-    int oldIndex = specificMessages.indexOf(aSpecificMessage);
-    specificMessages.remove(oldIndex);
-    if (aSpecificMessage.indexOfFragment(this) == -1)
+    int oldIndex = specificOperands.indexOf(aSpecificOperand);
+    specificOperands.remove(oldIndex);
+    if (aSpecificOperand.indexOfFragment(this) == -1)
     {
       wasRemoved = true;
     }
     else
     {
-      wasRemoved = aSpecificMessage.removeFragment(this);
+      wasRemoved = aSpecificOperand.removeFragment(this);
       if (!wasRemoved)
       {
-        specificMessages.add(oldIndex,aSpecificMessage);
+        specificOperands.add(oldIndex,aSpecificOperand);
       }
     }
     return wasRemoved;
   }
   /* Code from template association_SetMStarToMany */
-  public boolean setSpecificMessages(SpecificMessage... newSpecificMessages)
+  public boolean setSpecificOperands(SpecificOperand... newSpecificOperands)
   {
     boolean wasSet = false;
-    ArrayList<SpecificMessage> verifiedSpecificMessages = new ArrayList<SpecificMessage>();
-    for (SpecificMessage aSpecificMessage : newSpecificMessages)
+    ArrayList<SpecificOperand> verifiedSpecificOperands = new ArrayList<SpecificOperand>();
+    for (SpecificOperand aSpecificOperand : newSpecificOperands)
     {
-      if (verifiedSpecificMessages.contains(aSpecificMessage))
+      if (verifiedSpecificOperands.contains(aSpecificOperand))
       {
         continue;
       }
-      verifiedSpecificMessages.add(aSpecificMessage);
+      verifiedSpecificOperands.add(aSpecificOperand);
     }
 
-    if (verifiedSpecificMessages.size() != newSpecificMessages.length || verifiedSpecificMessages.size() < minimumNumberOfSpecificMessages())
+    if (verifiedSpecificOperands.size() != newSpecificOperands.length || verifiedSpecificOperands.size() < minimumNumberOfSpecificOperands())
     {
       return wasSet;
     }
 
-    ArrayList<SpecificMessage> oldSpecificMessages = new ArrayList<SpecificMessage>(specificMessages);
-    specificMessages.clear();
-    for (SpecificMessage aNewSpecificMessage : verifiedSpecificMessages)
+    ArrayList<SpecificOperand> oldSpecificOperands = new ArrayList<SpecificOperand>(specificOperands);
+    specificOperands.clear();
+    for (SpecificOperand aNewSpecificOperand : verifiedSpecificOperands)
     {
-      specificMessages.add(aNewSpecificMessage);
-      if (oldSpecificMessages.contains(aNewSpecificMessage))
+      specificOperands.add(aNewSpecificOperand);
+      if (oldSpecificOperands.contains(aNewSpecificOperand))
       {
-        oldSpecificMessages.remove(aNewSpecificMessage);
+        oldSpecificOperands.remove(aNewSpecificOperand);
       }
       else
       {
-        aNewSpecificMessage.addFragment(this);
+        aNewSpecificOperand.addFragment(this);
       }
     }
 
-    for (SpecificMessage anOldSpecificMessage : oldSpecificMessages)
+    for (SpecificOperand anOldSpecificOperand : oldSpecificOperands)
     {
-      anOldSpecificMessage.removeFragment(this);
+      anOldSpecificOperand.removeFragment(this);
     }
     wasSet = true;
     return wasSet;
   }
   /* Code from template association_AddIndexControlFunctions */
-  public boolean addSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
+  public boolean addSpecificOperandAt(SpecificOperand aSpecificOperand, int index)
   {  
     boolean wasAdded = false;
-    if(addSpecificMessage(aSpecificMessage))
+    if(addSpecificOperand(aSpecificOperand))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
-      specificMessages.remove(aSpecificMessage);
-      specificMessages.add(index, aSpecificMessage);
+      if(index > numberOfSpecificOperands()) { index = numberOfSpecificOperands() - 1; }
+      specificOperands.remove(aSpecificOperand);
+      specificOperands.add(index, aSpecificOperand);
       wasAdded = true;
     }
     return wasAdded;
   }
 
-  public boolean addOrMoveSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
+  public boolean addOrMoveSpecificOperandAt(SpecificOperand aSpecificOperand, int index)
   {
     boolean wasAdded = false;
-    if(specificMessages.contains(aSpecificMessage))
+    if(specificOperands.contains(aSpecificOperand))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
-      specificMessages.remove(aSpecificMessage);
-      specificMessages.add(index, aSpecificMessage);
+      if(index > numberOfSpecificOperands()) { index = numberOfSpecificOperands() - 1; }
+      specificOperands.remove(aSpecificOperand);
+      specificOperands.add(index, aSpecificOperand);
       wasAdded = true;
     } 
     else 
     {
-      wasAdded = addSpecificMessageAt(aSpecificMessage, index);
+      wasAdded = addSpecificOperandAt(aSpecificOperand, index);
     }
     return wasAdded;
   }
@@ -283,11 +283,11 @@ public abstract class Fragment
 
   public void delete()
   {
-    while (specificMessages.size() > 0)
+    while (specificOperands.size() > 0)
     {
-      SpecificMessage aSpecificMessage = specificMessages.get(specificMessages.size() - 1);
-      aSpecificMessage.delete();
-      specificMessages.remove(aSpecificMessage);
+      SpecificOperand aSpecificOperand = specificOperands.get(specificOperands.size() - 1);
+      aSpecificOperand.delete();
+      specificOperands.remove(aSpecificOperand);
     }
     
     SMSS placeholderSMSS = sMSS;

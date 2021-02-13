@@ -39,7 +39,6 @@ class SenderObject
 {
     isA Object;
     unique String name;
-    before setName { if (aName == ""){ return false; }}  
 }
 
 class ReceiverObject 
@@ -48,7 +47,7 @@ class ReceiverObject
   unique name;
 }
 
-class SpecificMessage
+class SpecificOperand
 {
   autounique id;
 	0..* -- 0..1 Message;
@@ -71,7 +70,7 @@ class Fragment
 {
   abstract;
   autounique id;
-  0..* <@>- 2..* SpecificMessage;
+  0..* <@>- 2..* SpecificOperand;
 }
 class AlternativeFragment 
 {

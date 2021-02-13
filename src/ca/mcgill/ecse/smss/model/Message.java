@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 58 "../../../../../SMSS.ump"
+// line 57 "../../../../../SMSS.ump"
 public class Message
 {
 
@@ -25,7 +25,7 @@ public class Message
   private SenderObject senderObject;
   private ReceiverObject receiverObject;
   private List<SpecificElement> specificElements;
-  private List<SpecificMessage> specificMessages;
+  private List<SpecificOperand> specificOperands;
 
   //------------------------
   // CONSTRUCTOR
@@ -48,7 +48,7 @@ public class Message
       throw new RuntimeException("Unable to create message due to receiverObject. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
     specificElements = new ArrayList<SpecificElement>();
-    specificMessages = new ArrayList<SpecificMessage>();
+    specificOperands = new ArrayList<SpecificOperand>();
   }
 
   //------------------------
@@ -129,33 +129,33 @@ public class Message
     return index;
   }
   /* Code from template association_GetMany */
-  public SpecificMessage getSpecificMessage(int index)
+  public SpecificOperand getSpecificOperand(int index)
   {
-    SpecificMessage aSpecificMessage = specificMessages.get(index);
-    return aSpecificMessage;
+    SpecificOperand aSpecificOperand = specificOperands.get(index);
+    return aSpecificOperand;
   }
 
-  public List<SpecificMessage> getSpecificMessages()
+  public List<SpecificOperand> getSpecificOperands()
   {
-    List<SpecificMessage> newSpecificMessages = Collections.unmodifiableList(specificMessages);
-    return newSpecificMessages;
+    List<SpecificOperand> newSpecificOperands = Collections.unmodifiableList(specificOperands);
+    return newSpecificOperands;
   }
 
-  public int numberOfSpecificMessages()
+  public int numberOfSpecificOperands()
   {
-    int number = specificMessages.size();
+    int number = specificOperands.size();
     return number;
   }
 
-  public boolean hasSpecificMessages()
+  public boolean hasSpecificOperands()
   {
-    boolean has = specificMessages.size() > 0;
+    boolean has = specificOperands.size() > 0;
     return has;
   }
 
-  public int indexOfSpecificMessage(SpecificMessage aSpecificMessage)
+  public int indexOfSpecificOperand(SpecificOperand aSpecificOperand)
   {
-    int index = specificMessages.indexOf(aSpecificMessage);
+    int index = specificOperands.indexOf(aSpecificOperand);
     return index;
   }
   /* Code from template association_SetOneToMany */
@@ -268,73 +268,73 @@ public class Message
     return wasAdded;
   }
   /* Code from template association_MinimumNumberOfMethod */
-  public static int minimumNumberOfSpecificMessages()
+  public static int minimumNumberOfSpecificOperands()
   {
     return 0;
   }
   /* Code from template association_AddManyToOptionalOne */
-  public boolean addSpecificMessage(SpecificMessage aSpecificMessage)
+  public boolean addSpecificOperand(SpecificOperand aSpecificOperand)
   {
     boolean wasAdded = false;
-    if (specificMessages.contains(aSpecificMessage)) { return false; }
-    Message existingMessage = aSpecificMessage.getMessage();
+    if (specificOperands.contains(aSpecificOperand)) { return false; }
+    Message existingMessage = aSpecificOperand.getMessage();
     if (existingMessage == null)
     {
-      aSpecificMessage.setMessage(this);
+      aSpecificOperand.setMessage(this);
     }
     else if (!this.equals(existingMessage))
     {
-      existingMessage.removeSpecificMessage(aSpecificMessage);
-      addSpecificMessage(aSpecificMessage);
+      existingMessage.removeSpecificOperand(aSpecificOperand);
+      addSpecificOperand(aSpecificOperand);
     }
     else
     {
-      specificMessages.add(aSpecificMessage);
+      specificOperands.add(aSpecificOperand);
     }
     wasAdded = true;
     return wasAdded;
   }
 
-  public boolean removeSpecificMessage(SpecificMessage aSpecificMessage)
+  public boolean removeSpecificOperand(SpecificOperand aSpecificOperand)
   {
     boolean wasRemoved = false;
-    if (specificMessages.contains(aSpecificMessage))
+    if (specificOperands.contains(aSpecificOperand))
     {
-      specificMessages.remove(aSpecificMessage);
-      aSpecificMessage.setMessage(null);
+      specificOperands.remove(aSpecificOperand);
+      aSpecificOperand.setMessage(null);
       wasRemoved = true;
     }
     return wasRemoved;
   }
   /* Code from template association_AddIndexControlFunctions */
-  public boolean addSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
+  public boolean addSpecificOperandAt(SpecificOperand aSpecificOperand, int index)
   {  
     boolean wasAdded = false;
-    if(addSpecificMessage(aSpecificMessage))
+    if(addSpecificOperand(aSpecificOperand))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
-      specificMessages.remove(aSpecificMessage);
-      specificMessages.add(index, aSpecificMessage);
+      if(index > numberOfSpecificOperands()) { index = numberOfSpecificOperands() - 1; }
+      specificOperands.remove(aSpecificOperand);
+      specificOperands.add(index, aSpecificOperand);
       wasAdded = true;
     }
     return wasAdded;
   }
 
-  public boolean addOrMoveSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
+  public boolean addOrMoveSpecificOperandAt(SpecificOperand aSpecificOperand, int index)
   {
     boolean wasAdded = false;
-    if(specificMessages.contains(aSpecificMessage))
+    if(specificOperands.contains(aSpecificOperand))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
-      specificMessages.remove(aSpecificMessage);
-      specificMessages.add(index, aSpecificMessage);
+      if(index > numberOfSpecificOperands()) { index = numberOfSpecificOperands() - 1; }
+      specificOperands.remove(aSpecificOperand);
+      specificOperands.add(index, aSpecificOperand);
       wasAdded = true;
     } 
     else 
     {
-      wasAdded = addSpecificMessageAt(aSpecificMessage, index);
+      wasAdded = addSpecificOperandAt(aSpecificOperand, index);
     }
     return wasAdded;
   }
@@ -358,9 +358,9 @@ public class Message
     {
       specificElements.get(0).setMessage(null);
     }
-    while( !specificMessages.isEmpty() )
+    while( !specificOperands.isEmpty() )
     {
-      specificMessages.get(0).setMessage(null);
+      specificOperands.get(0).setMessage(null);
     }
   }
 

@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 64 "../../../../../SMSS.ump"
+// line 63 "../../../../../SMSS.ump"
 public class Operand
 {
 
@@ -26,7 +26,7 @@ public class Operand
 
   //Operand Associations
   private SMSS sMSS;
-  private List<SpecificMessage> specificMessages;
+  private List<SpecificOperand> specificOperands;
 
   //------------------------
   // CONSTRUCTOR
@@ -41,7 +41,7 @@ public class Operand
     {
       throw new RuntimeException("Unable to create operand due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
-    specificMessages = new ArrayList<SpecificMessage>();
+    specificOperands = new ArrayList<SpecificOperand>();
   }
 
   //------------------------
@@ -71,33 +71,33 @@ public class Operand
     return sMSS;
   }
   /* Code from template association_GetMany */
-  public SpecificMessage getSpecificMessage(int index)
+  public SpecificOperand getSpecificOperand(int index)
   {
-    SpecificMessage aSpecificMessage = specificMessages.get(index);
-    return aSpecificMessage;
+    SpecificOperand aSpecificOperand = specificOperands.get(index);
+    return aSpecificOperand;
   }
 
-  public List<SpecificMessage> getSpecificMessages()
+  public List<SpecificOperand> getSpecificOperands()
   {
-    List<SpecificMessage> newSpecificMessages = Collections.unmodifiableList(specificMessages);
-    return newSpecificMessages;
+    List<SpecificOperand> newSpecificOperands = Collections.unmodifiableList(specificOperands);
+    return newSpecificOperands;
   }
 
-  public int numberOfSpecificMessages()
+  public int numberOfSpecificOperands()
   {
-    int number = specificMessages.size();
+    int number = specificOperands.size();
     return number;
   }
 
-  public boolean hasSpecificMessages()
+  public boolean hasSpecificOperands()
   {
-    boolean has = specificMessages.size() > 0;
+    boolean has = specificOperands.size() > 0;
     return has;
   }
 
-  public int indexOfSpecificMessage(SpecificMessage aSpecificMessage)
+  public int indexOfSpecificOperand(SpecificOperand aSpecificOperand)
   {
-    int index = specificMessages.indexOf(aSpecificMessage);
+    int index = specificOperands.indexOf(aSpecificOperand);
     return index;
   }
   /* Code from template association_SetOneToMany */
@@ -120,74 +120,74 @@ public class Operand
     return wasSet;
   }
   /* Code from template association_MinimumNumberOfMethod */
-  public static int minimumNumberOfSpecificMessages()
+  public static int minimumNumberOfSpecificOperands()
   {
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public SpecificMessage addSpecificMessage()
+  public SpecificOperand addSpecificOperand()
   {
-    return new SpecificMessage(this);
+    return new SpecificOperand(this);
   }
 
-  public boolean addSpecificMessage(SpecificMessage aSpecificMessage)
+  public boolean addSpecificOperand(SpecificOperand aSpecificOperand)
   {
     boolean wasAdded = false;
-    if (specificMessages.contains(aSpecificMessage)) { return false; }
-    Operand existingOperand = aSpecificMessage.getOperand();
+    if (specificOperands.contains(aSpecificOperand)) { return false; }
+    Operand existingOperand = aSpecificOperand.getOperand();
     boolean isNewOperand = existingOperand != null && !this.equals(existingOperand);
     if (isNewOperand)
     {
-      aSpecificMessage.setOperand(this);
+      aSpecificOperand.setOperand(this);
     }
     else
     {
-      specificMessages.add(aSpecificMessage);
+      specificOperands.add(aSpecificOperand);
     }
     wasAdded = true;
     return wasAdded;
   }
 
-  public boolean removeSpecificMessage(SpecificMessage aSpecificMessage)
+  public boolean removeSpecificOperand(SpecificOperand aSpecificOperand)
   {
     boolean wasRemoved = false;
-    //Unable to remove aSpecificMessage, as it must always have a operand
-    if (!this.equals(aSpecificMessage.getOperand()))
+    //Unable to remove aSpecificOperand, as it must always have a operand
+    if (!this.equals(aSpecificOperand.getOperand()))
     {
-      specificMessages.remove(aSpecificMessage);
+      specificOperands.remove(aSpecificOperand);
       wasRemoved = true;
     }
     return wasRemoved;
   }
   /* Code from template association_AddIndexControlFunctions */
-  public boolean addSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
+  public boolean addSpecificOperandAt(SpecificOperand aSpecificOperand, int index)
   {  
     boolean wasAdded = false;
-    if(addSpecificMessage(aSpecificMessage))
+    if(addSpecificOperand(aSpecificOperand))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
-      specificMessages.remove(aSpecificMessage);
-      specificMessages.add(index, aSpecificMessage);
+      if(index > numberOfSpecificOperands()) { index = numberOfSpecificOperands() - 1; }
+      specificOperands.remove(aSpecificOperand);
+      specificOperands.add(index, aSpecificOperand);
       wasAdded = true;
     }
     return wasAdded;
   }
 
-  public boolean addOrMoveSpecificMessageAt(SpecificMessage aSpecificMessage, int index)
+  public boolean addOrMoveSpecificOperandAt(SpecificOperand aSpecificOperand, int index)
   {
     boolean wasAdded = false;
-    if(specificMessages.contains(aSpecificMessage))
+    if(specificOperands.contains(aSpecificOperand))
     {
       if(index < 0 ) { index = 0; }
-      if(index > numberOfSpecificMessages()) { index = numberOfSpecificMessages() - 1; }
-      specificMessages.remove(aSpecificMessage);
-      specificMessages.add(index, aSpecificMessage);
+      if(index > numberOfSpecificOperands()) { index = numberOfSpecificOperands() - 1; }
+      specificOperands.remove(aSpecificOperand);
+      specificOperands.add(index, aSpecificOperand);
       wasAdded = true;
     } 
     else 
     {
-      wasAdded = addSpecificMessageAt(aSpecificMessage, index);
+      wasAdded = addSpecificOperandAt(aSpecificOperand, index);
     }
     return wasAdded;
   }
@@ -200,10 +200,10 @@ public class Operand
     {
       placeholderSMSS.removeOperand(this);
     }
-    for(int i=specificMessages.size(); i > 0; i--)
+    for(int i=specificOperands.size(); i > 0; i--)
     {
-      SpecificMessage aSpecificMessage = specificMessages.get(i - 1);
-      aSpecificMessage.delete();
+      SpecificOperand aSpecificOperand = specificOperands.get(i - 1);
+      aSpecificOperand.delete();
     }
   }
 

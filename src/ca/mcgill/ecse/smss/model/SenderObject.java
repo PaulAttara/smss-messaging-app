@@ -45,9 +45,6 @@ public class SenderObject extends Object
   public boolean setName(String aName)
   {
     boolean wasSet = false;
-    // line 42 "../../../../../SMSS.ump"
-    if (aName == ""){ return false; }
-    // END OF UMPLE BEFORE INJECTION
     String anOldName = getName();
     if (anOldName != null && anOldName.equals(aName)) {
       return true;

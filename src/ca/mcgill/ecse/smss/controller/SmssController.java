@@ -17,7 +17,7 @@ import ca.mcgill.ecse.smss.model.ReceiverObject;
 import ca.mcgill.ecse.smss.model.SMSS;
 import ca.mcgill.ecse.smss.model.SenderObject;
 import ca.mcgill.ecse.smss.model.SpecificElement;
-import ca.mcgill.ecse.smss.model.SpecificMessage;
+import ca.mcgill.ecse.smss.model.SpecificOperand;
 
 public class SmssController {
 	
@@ -88,21 +88,19 @@ public class SmssController {
 	}
 	
 	// Unable to create Fragment. MUST HAVE AT LEAST 2 SPECIFIC MESSAGES
-	public static void createFragment(String fragmentType, int operandId1, int operandId2, int receiverId) throws InvalidInputException {
+	public static void createFragment(String fragmentType, List<SpecificOperand> specificOperands) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
 		try {
-			SpecificMessage specificMessage1 = new SpecificMessage(getOperand(operandId1));
-			SpecificMessage specificMessage2 = new SpecificMessage(getOperand(operandId2));
 			SpecificElement specificElement = new SpecificElement(smss.getMethod());
 			
 			// alternative fragment
 			if(fragmentType == "alt") {
-				AlternativeFragment frag = new AlternativeFragment(smss, specificElement,specificMessage1, specificMessage2);
+				AlternativeFragment frag = new AlternativeFragment(smss, specificElement, specificOperands);
 				
 			}
 			// parallel fragment
 			else {
-				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificMessage1, specificMessage2);
+				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificOperands);
 			}
 			
 			// QUESTION: DOES THE COMPOSITION FROM SMSS TO FRAGMENT MESS UP WITH THIS? so far, no!
@@ -113,10 +111,13 @@ public class SmssController {
 		}
 	}
 	
-	public static void createOperand(String condition) throws InvalidInputException {
+	public static void createOperand(String condition, List<Message> messages) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
 		try {
 			Operand operand = new Operand(condition, smss);
+			smss.addOperand(operand);
+			SpecificOperand specificOperand = new SpecificOperand(operand);
+			
 		}
 		catch (RuntimeException e) {
 			throw new InvalidInputException(e.getMessage());
