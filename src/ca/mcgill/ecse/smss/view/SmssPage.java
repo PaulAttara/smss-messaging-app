@@ -763,8 +763,8 @@ public class SmssPage extends JFrame {
 			}
 			else {
 				ClassType classType = SmssController.getClassTypeByName(classes.get(selectedClassType2).getName());
-				System.out.print(classType.getName());
 				SmssController.createReceiver(classType.getName(), receiverTextField.getText());
+				
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();

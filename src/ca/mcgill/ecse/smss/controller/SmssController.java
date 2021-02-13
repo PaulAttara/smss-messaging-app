@@ -69,6 +69,9 @@ public class SmssController {
 		SMSS smss = SmssApplication.getSmss();
 		try {
 			getClassTypeByName(className).addObject(new ReceiverObject(getClassTypeByName(className), receiverName));
+			System.out.println(getClassTypeByName(className));
+			System.out.println(getClassTypeByName(className).getObjects());
+
 		}
 		catch (RuntimeException e) {
 			throw new InvalidInputException(e.getMessage());
@@ -243,6 +246,7 @@ public class SmssController {
 				}
 			}
 		}
+		System.out.println(receivers.size());
 		return receivers;
 	}
 	
@@ -353,13 +357,14 @@ public class SmssController {
 			return false;
 		}
 		else {
-		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
-				
-		for(Object r : objects) {
-			if(r instanceof ReceiverObject) {
-				return true;
+			List<ClassType> classes = SmssApplication.getSmss().getClassTypes();
+			List<ReceiverObject> receivers = new ArrayList<>();
+			for(ClassType c : classes) {
+				for(Object r : c.getObjects()) {
+					if(r instanceof ReceiverObject) {
+return true;					}
+				}
 			}
-		}
 		return false;
 		}
 	}
@@ -389,4 +394,13 @@ public class SmssController {
 	public static boolean hasSpecificElements() throws InvalidInputException {
 		return SmssApplication.getSmss().getMethod().getSpecificElements().size() > 0;
 	}
+	
+	public static boolean hasFragments() throws InvalidInputException {
+		
+		if( SmssApplication.getSmss().getFragments().size() > 0) {
+			return true;
+		}else {
+			return false;
+		}
+}
 }
