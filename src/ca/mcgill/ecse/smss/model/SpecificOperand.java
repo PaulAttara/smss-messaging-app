@@ -30,15 +30,10 @@ public class SpecificOperand
   // CONSTRUCTOR
   //------------------------
 
-  public SpecificOperand(Operand aOperand, Message... allMessages)
+  public SpecificOperand(Operand aOperand)
   {
     id = nextId++;
     messages = new ArrayList<Message>();
-    boolean didAddMessages = setMessages(allMessages);
-    if (!didAddMessages)
-    {
-      throw new RuntimeException("Unable to create SpecificOperand, must have at least 1 messages. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
-    }
     boolean didAddOperand = setOperand(aOperand);
     if (!didAddOperand)
     {
@@ -120,16 +115,10 @@ public class SpecificOperand
     int index = fragments.indexOf(aFragment);
     return index;
   }
-  /* Code from template association_IsNumberOfValidMethod */
-  public boolean isNumberOfMessagesValid()
-  {
-    boolean isValid = numberOfMessages() >= minimumNumberOfMessages();
-    return isValid;
-  }
   /* Code from template association_MinimumNumberOfMethod */
   public static int minimumNumberOfMessages()
   {
-    return 1;
+    return 0;
   }
   /* Code from template association_AddManyToManyMethod */
   public boolean addMessage(Message aMessage)
@@ -151,16 +140,11 @@ public class SpecificOperand
     }
     return wasAdded;
   }
-  /* Code from template association_AddMStarToMany */
+  /* Code from template association_RemoveMany */
   public boolean removeMessage(Message aMessage)
   {
     boolean wasRemoved = false;
     if (!messages.contains(aMessage))
-    {
-      return wasRemoved;
-    }
-
-    if (numberOfMessages() <= minimumNumberOfMessages())
     {
       return wasRemoved;
     }
@@ -180,47 +164,6 @@ public class SpecificOperand
       }
     }
     return wasRemoved;
-  }
-  /* Code from template association_SetMStarToMany */
-  public boolean setMessages(Message... newMessages)
-  {
-    boolean wasSet = false;
-    ArrayList<Message> verifiedMessages = new ArrayList<Message>();
-    for (Message aMessage : newMessages)
-    {
-      if (verifiedMessages.contains(aMessage))
-      {
-        continue;
-      }
-      verifiedMessages.add(aMessage);
-    }
-
-    if (verifiedMessages.size() != newMessages.length || verifiedMessages.size() < minimumNumberOfMessages())
-    {
-      return wasSet;
-    }
-
-    ArrayList<Message> oldMessages = new ArrayList<Message>(messages);
-    messages.clear();
-    for (Message aNewMessage : verifiedMessages)
-    {
-      messages.add(aNewMessage);
-      if (oldMessages.contains(aNewMessage))
-      {
-        oldMessages.remove(aNewMessage);
-      }
-      else
-      {
-        aNewMessage.addSpecificOperand(this);
-      }
-    }
-
-    for (Message anOldMessage : oldMessages)
-    {
-      anOldMessage.removeSpecificOperand(this);
-    }
-    wasSet = true;
-    return wasSet;
   }
   /* Code from template association_AddIndexControlFunctions */
   public boolean addMessageAt(Message aMessage, int index)

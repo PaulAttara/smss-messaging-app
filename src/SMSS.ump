@@ -50,7 +50,7 @@ class ReceiverObject
 class SpecificOperand
 {
   autounique id;
-	0..* -- 1..* Message;
+	0..* -- 0..* Message;
 	0..* -- 1 Operand;
 }
 

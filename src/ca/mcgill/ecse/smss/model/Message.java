@@ -373,14 +373,7 @@ public class Message
     specificOperands.clear();
     for(SpecificOperand aSpecificOperand : copyOfSpecificOperands)
     {
-      if (aSpecificOperand.numberOfMessages() <= SpecificOperand.minimumNumberOfMessages())
-      {
-        aSpecificOperand.delete();
-      }
-      else
-      {
-        aSpecificOperand.removeMessage(this);
-      }
+      aSpecificOperand.removeMessage(this);
     }
   }
 

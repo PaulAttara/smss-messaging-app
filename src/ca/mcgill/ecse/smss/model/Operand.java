@@ -125,9 +125,9 @@ public class Operand
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public SpecificOperand addSpecificOperand(Message... allMessages)
+  public SpecificOperand addSpecificOperand()
   {
-    return new SpecificOperand(this, allMessages);
+    return new SpecificOperand(this);
   }
 
   public boolean addSpecificOperand(SpecificOperand aSpecificOperand)
