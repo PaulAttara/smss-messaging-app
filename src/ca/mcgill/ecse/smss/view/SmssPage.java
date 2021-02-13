@@ -91,7 +91,6 @@ public class SmssPage extends JFrame {
 	private JTextField messageTextfield;
 	private JButton createMessageButton;
 	private JList messageList1;
-//	private List<Message> messageList;
 	JScrollPane messageListScrollPane;
 
 	// Operand
@@ -100,16 +99,18 @@ public class SmssPage extends JFrame {
 	private JComboBox<String> operandDropdown;
 	private JButton createOperandButton;
 	private JList operandList;
+	private int selectedOperand;
 
 	// Fragment
 	private JLabel fragmentLabel;
 	private JComboBox<String> fragmentTypeDropdown; 
 	private JButton createFragmentButton;
+	private String selectedOperandId;
+	private String selectedFragmentType;
 	
 	// Editor
 	private JTable overviewTable;
 	private JScrollPane overviewScrollPane;
-	
 	private DefaultTableModel overviewDtm;
 	private String overviewColumnNames[] = {"Editor"};
 	private static final int HEIGHT_OVERVIEW_TABLE = 200;
@@ -221,14 +222,13 @@ public class SmssPage extends JFrame {
 		operandList = new JList<>(listModelOperands);
 		operandList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
         JScrollPane operandListScrollPane = new JScrollPane(operandList);
-		
+
         // elements for fragment
 		fragmentLabel = new JLabel();
 		fragmentTypeDropdown = new JComboBox<String>(new String[0]);
 		fragmentTypeDropdown.addItem("Parallel");
 		fragmentTypeDropdown.addItem("Alternative");
 		createFragmentButton = new JButton();
-		
 		
 		// global settings and listeners
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -593,6 +593,7 @@ public class SmssPage extends JFrame {
 		// call the controller
 		try {
 			SmssController.createSmss(smssTextField.getText());
+			smssCreateButton.setEnabled(false);
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
 		}
@@ -690,6 +691,9 @@ public class SmssPage extends JFrame {
 		try {
 			if(messageTextfield.getText().equals("")) {
 				throw(new InvalidInputException("Message name cannot be empty"));
+			}
+			if(selectedReceiver2 == -1) {
+				throw(new InvalidInputException("Receiver must be selected"));
 			}else {
 				ReceiverObject receiverObj = SmssController.getReceiverByName(receivers.get(selectedReceiver2).getName());
 				SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
@@ -715,8 +719,6 @@ public class SmssPage extends JFrame {
 		}
 		
 		//call the controller
-		System.out.print(selectedValues);
-		System.out.print(messages);
 		SmssController.createSpecificOperand(operandCondition.getText(), messages);
 		}catch (InvalidInputException e) {
 			error = e.getMessage();
@@ -732,11 +734,26 @@ public class SmssPage extends JFrame {
 		
 		// call the controller
 		try {
-			if(messageTextfield.getText().equals("")) {
-				throw(new InvalidInputException("Message name cannot be empty"));
+			if(operandList.getSelectedValuesList().size() < 2) {
+				throw(new InvalidInputException("At least 2 operands must be selected"));
 			}else {
-				ReceiverObject receiverObj = SmssController.getReceiverByName(receivers.get(selectedReceiver1).getName());
-				SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
+				
+				List<String> selectedValues = operandList.getSelectedValuesList();
+				List<SpecificOperand> specificOperands = new ArrayList<>();
+
+				for(String value: selectedValues) {
+					
+					if(value.contains(" ")){
+						selectedOperandId = value.substring(0, value.indexOf(" ")); 
+						System.out.println(selectedOperandId);
+						specificOperands.add(SmssController.getSpecificOperandById(Integer.parseInt(selectedOperandId)));
+					}
+					else {
+						throw(new InvalidInputException("Invalid operand selected"));
+					}
+				}
+				selectedFragmentType = (String)fragmentTypeDropdown.getSelectedItem();
+				SmssController.createFragment(selectedFragmentType, specificOperands);
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();

@@ -97,7 +97,7 @@ public class SmssController {
 			SpecificElement specificElement = new SpecificElement(smss.getMethod());
 			
 			// alternative fragment
-			if(fragmentType == "alt") {
+			if(fragmentType == "Alternative") {
 				AlternativeFragment frag = new AlternativeFragment(smss, specificElement, specificOperands.get(0), specificOperands.get(1));
 				if(specificOperands.size() > 2) {
 					for(int i = 2; i < specificOperands.size(); i++) {
@@ -107,7 +107,7 @@ public class SmssController {
 				specificElement.setFragment(frag);
 			}
 			// parallel fragment
-			else {
+			else if(fragmentType == "Parallel"){
 				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificOperands.get(0), specificOperands.get(1));
 				if(specificOperands.size() > 2) {
 					for(int i = 2; i < specificOperands.size(); i++) {
@@ -116,8 +116,6 @@ public class SmssController {
 				}
 				specificElement.setFragment(frag);
 			}
-			SmssApplication.getSmss().getMethod().addSpecificElement(specificElement);
-			// QUESTION: DOES THE COMPOSITION FROM SMSS TO FRAGMENT MESS UP WITH THIS? so far, no!
 			smss.getMethod().addSpecificElement(specificElement);
 			}
 		}
@@ -125,29 +123,6 @@ public class SmssController {
 			throw new InvalidInputException(e.getMessage());
 		}
 	}
-	
-//	public static void createSpecificElement(String fragmentType, List<SpecificOperand> specificOperands) throws InvalidInputException {
-//		SMSS smss = SmssApplication.getSmss();
-//		try {
-//			SpecificElement specificElement = new SpecificElement(smss.getMethod());
-//			
-//			// alternative fragment
-//			if(fragmentType == "alt") {
-//				AlternativeFragment frag = new AlternativeFragment(smss, specificElement, specificOperands);
-//				
-//			}
-//			// parallel fragment
-//			else {
-//				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificOperands);
-//			}
-//			
-//			// QUESTION: DOES THE COMPOSITION FROM SMSS TO FRAGMENT MESS UP WITH THIS? so far, no!
-//			smss.getMethod().addSpecificElement(specificElement);
-//		}
-//		catch (RuntimeException e) {
-//			throw new InvalidInputException(e.getMessage());
-//		}
-//	}
 	
 	public static void createSpecificOperand(String condition, List<Message> messages) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
@@ -165,26 +140,6 @@ public class SmssController {
 			throw new InvalidInputException(e.getMessage());
 		}
 	}
-	
-	//messasges list then create operand
-	// specific operand.getmesaages
-			
-	
-
-	// create message, operand
-	// create specific message with both of those
-	// then when specifying fragment add specific message which has operand and fragment linked to it
-	
-	// whrn add to editoor: select message OR fragment
-	// then add specific message: which has operand and message
-	/// adding operant and fragment to a message
-	// then adding specific element to the method
-	
-	// add message the editor
-	// create fragment
-	// add message to editor: creates specific element attached to a message
-	
-	
 	
 	// GETTERS--------------------------------------------------------------------------------------------------------------------------------
 
@@ -323,10 +278,8 @@ public class SmssController {
 		}
 		return null;
 	}
-	//TODO
-	// get specific operand and get fragment
 	
-	public static SpecificOperand getSpecificOperand(int specificOperandId) {
+	public static SpecificOperand getSpecificOperandById(int specificOperandId) {
 		
 		List<Operand> operands = SmssApplication.getSmss().getOperands();
 	
