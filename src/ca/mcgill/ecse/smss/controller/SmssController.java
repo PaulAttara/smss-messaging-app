@@ -340,6 +340,19 @@ public class SmssController {
 		return null;
 	}
 	
+	public static List<SpecificOperand> getSpecificOperands() {
+		
+		List<SpecificOperand> specificOperands = new ArrayList<>();
+		List<Operand> operands = SmssApplication.getSmss().getOperands();
+	
+		for(Operand operand : operands) {
+			for(SpecificOperand s : operand.getSpecificOperands()) {
+				specificOperands.add(s);
+			}
+		}
+		return specificOperands;
+	}
+	
 	public static List<Fragment> getFragments() {
 		return SmssApplication.getSmss().getFragments();	
 	}
@@ -397,7 +410,6 @@ public class SmssController {
 	}
 	
 	public static boolean hasSpecificOperands() throws InvalidInputException {
-		int count = 0;
 		List<Operand> operands = SmssApplication.getSmss().getOperands();
 		for(Operand operand : operands) {
 			if(operand.hasSpecificOperands()) {
