@@ -530,8 +530,8 @@ public class SmssPage extends JFrame {
 			{
 				listModelOperands.removeAllElements();
 				for (SpecificOperand specificOperand : SmssController.getSpecificOperands()) {
-					//String stringbuild = String.valueof(specificOperand.getId()) + " operand" + "/ condition: [" + specificOperand.getCondition() + "] / Message Count:" + specificOperand.getMessages().size();
-					//listModelOperands.addElement(stringbuild);
+					String stringbuild = specificOperand.getId() + " operand" + "/ condition: [" + specificOperand.getOperand().getCondition() + "] / Message Count:" + specificOperand.getMessages().size();
+					listModelOperands.addElement(stringbuild);
 				};
 			}
 		
@@ -705,9 +705,22 @@ public class SmssPage extends JFrame {
 	private void createOperandButtonActionPerformed(ActionEvent evt) {
 		// clear error message	
 		error = null;
+		try{
+			
+		List<String> selectedValues = messageList1.getSelectedValuesList();
+		List<Message> messages = new ArrayList<>();
+
+		for(String value: selectedValues) {
+			messages.add(SmssController.getMessageByName(value));
+		}
 		
 		//call the controller
-		//SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
+		System.out.print(selectedValues);
+		System.out.print(messages);
+		SmssController.createSpecificOperand(operandCondition.getText(), messages);
+		}catch (InvalidInputException e) {
+			error = e.getMessage();
+		}
 			
 		//update visuals
 		refreshData();
