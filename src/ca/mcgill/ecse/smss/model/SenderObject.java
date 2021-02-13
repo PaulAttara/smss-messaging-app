@@ -9,6 +9,12 @@ public class SenderObject extends Object
 {
 
   //------------------------
+  // STATIC VARIABLES
+  //------------------------
+
+  private static Map<String, SenderObject> senderobjectsByName = new HashMap<String, SenderObject>();
+
+  //------------------------
   // MEMBER VARIABLES
   //------------------------
 
@@ -25,7 +31,10 @@ public class SenderObject extends Object
   public SenderObject(ClassType aClassType, String aName)
   {
     super(aClassType);
-    name = aName;
+    if (!setName(aName))
+    {
+      throw new RuntimeException("Cannot create due to duplicate name. See http://manual.umple.org?RE003ViolationofUniqueness.html");
+    }
     messages = new ArrayList<Message>();
   }
 
@@ -36,14 +45,38 @@ public class SenderObject extends Object
   public boolean setName(String aName)
   {
     boolean wasSet = false;
+    // line 42 "../../../../../SMSS.ump"
+    if (aName == ""){ return false; }
+    // END OF UMPLE BEFORE INJECTION
+    String anOldName = getName();
+    if (anOldName != null && anOldName.equals(aName)) {
+      return true;
+    }
+    if (hasWithName(aName)) {
+      return wasSet;
+    }
     name = aName;
     wasSet = true;
+    if (anOldName != null) {
+      senderobjectsByName.remove(anOldName);
+    }
+    senderobjectsByName.put(aName, this);
     return wasSet;
   }
 
   public String getName()
   {
     return name;
+  }
+  /* Code from template attribute_GetUnique */
+  public static SenderObject getWithName(String aName)
+  {
+    return senderobjectsByName.get(aName);
+  }
+  /* Code from template attribute_HasUnique */
+  public static boolean hasWithName(String aName)
+  {
+    return getWithName(aName) != null;
   }
   /* Code from template association_GetMany */
   public Message getMessage(int index)
@@ -150,6 +183,7 @@ public class SenderObject extends Object
 
   public void delete()
   {
+    senderobjectsByName.remove(getName());
     for(int i=messages.size(); i > 0; i--)
     {
       Message aMessage = messages.get(i - 1);

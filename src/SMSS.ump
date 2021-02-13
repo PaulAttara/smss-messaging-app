@@ -38,13 +38,14 @@ class Object
 class SenderObject 
 {
     isA Object;
-    String name;
+    unique String name;
+    before setName { if (aName == ""){ return false; }}  
 }
 
 class ReceiverObject 
 {
   isA Object;
-  autounique id;
+  unique name;
 }
 
 class SpecificMessage

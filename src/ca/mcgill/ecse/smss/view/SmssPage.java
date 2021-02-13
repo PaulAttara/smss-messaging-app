@@ -5,7 +5,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -30,6 +32,7 @@ import ca.mcgill.ecse.smss.model.SMSS;
 import ca.mcgill.ecse.smss.model.SenderObject;
 import ca.mcgill.ecse.smss.model.ClassType;
 import ca.mcgill.ecse.smss.model.Message;
+import ca.mcgill.ecse.smss.model.Operand;
 import ca.mcgill.ecse.smss.model.ReceiverObject;
 import ca.mcgill.ecse.smss.application.SmssApplication;
 import ca.mcgill.ecse.smss.controller.InvalidInputException;
@@ -71,31 +74,37 @@ public class SmssPage extends JFrame {
 	private int selectedClassType2 = -1;
 	private int selectedReceiver1 = -1;
 	private int selectedReceiver2 = -1;
+	
 	// Receiver
 	private JLabel receiverLabel;
 	private JTextField receiverTextField;
 	private JComboBox<String> classTypesDropdown2;
 	private JButton createReceiverButton;
 	private JComboBox<String> receiverDropdown1;
+	private JComboBox<String> receiverDropdown2;
 	
-	//messages
+	// Messages
 	private JLabel messageLabel;
 	private JComboBox<String> senderDropdown;
 	private JTextField messageTextfield;
-	private JComboBox<String> receiverDropdown2;
 	private JButton createMessageButton;
+	private JList messageList1;
+//	private List<Message> messageList;
+	JScrollPane messageListScrollPane;
 
+	// Operand
 	private JLabel operandLabel;
 	private JTextField operandCondition; 
-	private JList messageList1;
 	private JComboBox<String> operandDropdown;
 	private JButton createOperandButton;
+	private JList operandList;
 
+	// Fragment
 	private JLabel fragmentLabel;
 	private JComboBox<String> fragmentTypeDropdown; 
-	private JList operandList;
 	private JButton createFragmentButton;
 	
+	// Editor
 	private JTable overviewTable;
 	private JScrollPane overviewScrollPane;
 	
@@ -104,16 +113,17 @@ public class SmssPage extends JFrame {
 	private static final int HEIGHT_OVERVIEW_TABLE = 200;
 	
 	
-	// data elements
+	// Data Elements
 	private String error = null;
 	private HashMap<Integer, ClassType> classTypes;
  
 	private JLabel emptyLabel;
 	
-    private DefaultListModel<String> listModel;
+    private DefaultListModel<String> listModelMessages;
+    private DefaultListModel<String> listModelOperands;
 
 	private HashMap<Integer, ClassType> classes;
-	private HashMap<Integer, ReceiverObject> receivers;
+	private List<ReceiverObject> receivers;
 
 	public SmssPage() throws InvalidInputException {
 		initComponents();
@@ -127,9 +137,8 @@ public class SmssPage extends JFrame {
 		
 		emptyLabel = new JLabel();
 		
-		 listModel = new DefaultListModel<String>();
-	     
-		
+		listModelMessages = new DefaultListModel<>();
+		listModelOperands = new DefaultListModel<>();
 		
 		// elements for smss
 		smssLabel = new JLabel();
@@ -151,25 +160,12 @@ public class SmssPage extends JFrame {
 		classTextField = new JTextField();
 		classCreateButton = new JButton();
 		classTypesDropdown1 = new JComboBox<String>(new String[0]);
+		classTypesDropdown2 = new JComboBox<String>(new String[0]);
 		
 		classTypesDropdown1.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 		        JComboBox<String> cb = (JComboBox<String>) evt.getSource();
 		        selectedClassType1 = cb.getSelectedIndex();
-			}
-		});
-		
-		
-		receiverLabel = new JLabel();
-		receiverTextField = new JTextField();
-		createReceiverButton = new JButton();
-		classTypesDropdown2 = new JComboBox<String>(new String[0]);
-		receiverDropdown1 = new JComboBox<String>(new String[0]);
-		
-		receiverDropdown1.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-		        JComboBox<String> cb = (JComboBox<String>) evt.getSource();
-		        selectedReceiver1 = cb.getSelectedIndex();
 			}
 		});
 		
@@ -180,11 +176,19 @@ public class SmssPage extends JFrame {
 			}
 		});
 		
-		messageLabel = new JLabel();
-		senderDropdown = new JComboBox<String>(new String[0]);
-		messageTextfield = new JTextField();
+		// elements for receiver
+		receiverLabel = new JLabel();
+		receiverTextField = new JTextField();
+		createReceiverButton = new JButton();
+		receiverDropdown1 = new JComboBox<String>(new String[0]);
 		receiverDropdown2 = new JComboBox<String>(new String[0]);
-		createMessageButton = new JButton();
+		
+		receiverDropdown1.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+		        JComboBox<String> cb = (JComboBox<String>) evt.getSource();
+		        selectedReceiver1 = cb.getSelectedIndex();
+			}
+		});
 		
 		receiverDropdown2.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -193,30 +197,45 @@ public class SmssPage extends JFrame {
 			}
 		});
 		
-		operandLabel = new JLabel();
-		operandCondition = new JTextField();
-		operandDropdown = new JComboBox<String>(new String[0]);
-		createOperandButton = new JButton();
+		// elements for message
+		messageLabel = new JLabel();
+		senderDropdown = new JComboBox<String>(new String[0]);
+		messageTextfield = new JTextField();
+		createMessageButton = new JButton();
 		
-		messageList1 = new JList<String>(listModel);
+		// elements for message pane list
+//		messageList = new ArrayList<>();
+		messageList1 = new JList<>(listModelMessages);
         messageList1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
 
         messageList1.setSelectedIndex(0);
         //messageList1.addMessageListSelectionListener(this);
         messageList1.setVisibleRowCount(5);
         JScrollPane messageListScrollPane = new JScrollPane(messageList1);
+        
+        
+		// elements for operand
+		operandLabel = new JLabel();
+		operandCondition = new JTextField();
+		operandDropdown = new JComboBox<String>(new String[0]);
+		createOperandButton = new JButton();
 		
-		fragmentLabel = new JLabel();
-		fragmentTypeDropdown = new JComboBox<String>(new String[0]);
-		createFragmentButton = new JButton();
-		
-		operandList = new JList<String>(listModel);
+		// elements for operand pane list
+		operandList = new JList<>(listModelOperands);
 		operandList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
 		
 		operandList.setSelectedIndex(0);
 		//operandList.addOperandListSelectionListener(this);
 		operandList.setVisibleRowCount(5);
         JScrollPane operandListScrollPane = new JScrollPane(operandList);
+		
+        // elements for fragment
+		fragmentLabel = new JLabel();
+		fragmentTypeDropdown = new JComboBox<String>(new String[0]);
+		fragmentTypeDropdown.addItem("Parallel");
+		fragmentTypeDropdown.addItem("Alternative");
+		createFragmentButton = new JButton();
+		
 		
 		// global settings and listeners
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -230,6 +249,8 @@ public class SmssPage extends JFrame {
 		smssCreateButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				createSMSSButtonActionPerformed(evt);
+				methodCreateButton.setEnabled(true);
+				senderCreateButton.setEnabled(true);
 			}
 		});
 		
@@ -447,11 +468,12 @@ public class SmssPage extends JFrame {
 						.addComponent(overviewScrollPane))
 				
 				);
+		methodCreateButton.setEnabled(false);
+		senderCreateButton.setEnabled(false);
 		pack();
 
 							
 	}
-
 
 
 	private void refreshData() {
@@ -459,8 +481,12 @@ public class SmssPage extends JFrame {
 		if (error == null || error.length() == 0) {
 			// clear text fields
 			classTextField.setText("");
+			receiverTextField.setText("");
+			messageTextfield.setText("");
+			
 		try{
 			if(SmssController.hasSenderObject()) {
+				senderDropdown.removeAllItems();
 				senderDropdown.addItem(SmssController.getSenderName());
 				senderDropdown.setSelectedIndex(0);
 			}
@@ -479,31 +505,33 @@ public class SmssPage extends JFrame {
 				selectedClassType2 = -1;
 				classTypesDropdown1.setSelectedIndex(selectedClassType1);
 				classTypesDropdown2.setSelectedIndex(selectedClassType2);
-
 			}
 			
 			if(SmssController.hasReceivers()) {
-				receivers = new HashMap<Integer, ReceiverObject>();
+				receivers = new ArrayList<ReceiverObject>();
 				receiverDropdown1.removeAllItems();
 				receiverDropdown2.removeAllItems();
 				Integer index = 0;
-				for (ReceiverObject receiver : SmssController.getReceiversNonHash()) {
-					receivers.put(index, receiver);
-					receiverDropdown1.addItem(String.valueOf(receiver.getId()));
-					receiverDropdown2.addItem(String.valueOf(receiver.getId()));
+				for (ReceiverObject receiver : SmssController.getReceivers()) {
+					receivers.add(receiver);
+					receiverDropdown1.addItem(receiver.getName());
+					receiverDropdown2.addItem(receiver.getName());
 					index++;
 				};
 				selectedReceiver1 = -1;
 				selectedReceiver2 = -1;
-				receiverDropdown1.setSelectedIndex(selectedClassType1);
-				receiverDropdown2.setSelectedIndex(selectedClassType2);
+				receiverDropdown1.setSelectedIndex(selectedReceiver1);
+				receiverDropdown2.setSelectedIndex(selectedReceiver2);
 			}
 			
-			if(SmssController.hasMessages()) {
+			if(SmssController.hasMessages()) 
+			{
+				listModelMessages = new DefaultListModel<>();
 				for (Message message : SmssController.getMessages()) {
-					listModel.addElement(message.getName());
+					listModelMessages.addElement(message.getName());
 				};
 		        messageList1.setSelectedIndex(-1);
+		        messageListScrollPane = new JScrollPane(messageList1);
 			}
 			
 		}
@@ -576,9 +604,13 @@ public class SmssPage extends JFrame {
 		// clear error message	
 		error = null;
 		
-		// call the controller
 		try {
+			if(methodTextField.getText().equals("")) {
+				throw(new InvalidInputException("Method cannot be null"));
+			}
+			// call the controller
 			SmssController.createMethod(methodTextField.getText());
+			methodCreateButton.setEnabled(false);
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
 		}
@@ -590,10 +622,14 @@ public class SmssPage extends JFrame {
 	private void createSenderButtonActionPerformed(ActionEvent evt) {
 		// clear error message	
 		error = null;
-		
-		// call the controller
 		try {
+		if(senderTextField.getText().equals("")) {
+			throw(new InvalidInputException("Sender cannot be null"));
+		}
+		// call the controller
+		
 			SmssController.createSender(senderTextField.getText());
+			senderCreateButton.setEnabled(false);
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
 		}
@@ -627,11 +663,15 @@ public class SmssPage extends JFrame {
 		
 		// call the controller
 		try {
-			if(classTextField.getText().equals("")) {
+			if(selectedClassType2 == -1) {
+				throw(new InvalidInputException("Class name cannot be empty"));
+			}
+			if(receiverTextField.getText().equals("")) {
 				throw(new InvalidInputException("Receiver name cannot be empty"));
-			}else {
+			}
+			else {
 				ClassType classType = SmssController.getClassTypeByName(classes.get(selectedClassType2).getName());
-				//SmssController.createReceiver(receiverTextField.getText(), classType.getName());
+				SmssController.createReceiver(classType.getName(), receiverTextField.getText());
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
@@ -650,8 +690,8 @@ public class SmssPage extends JFrame {
 			if(messageTextfield.getText().equals("")) {
 				throw(new InvalidInputException("Message name cannot be empty"));
 			}else {
-				ReceiverObject receiverObj = SmssController.getReceiverById(receivers.get(selectedReceiver1).getId());
-				SmssController.createMessage(messageTextfield.getText(), receiverObj.getId());
+				ReceiverObject receiverObj = SmssController.getReceiverByName(receivers.get(selectedReceiver2).getName());
+				SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
@@ -670,8 +710,8 @@ public class SmssPage extends JFrame {
 			if(operandCondition.getText().equals("")) {
 				throw(new InvalidInputException("Message name cannot be empty"));
 			}else {
-				ReceiverObject receiverObj = SmssController.getReceiverById(receivers.get(selectedReceiver1).getId());
-				SmssController.createMessage(messageTextfield.getText(), receiverObj.getId());
+				ReceiverObject receiverObj = SmssController.getReceiverByName(receivers.get(selectedReceiver1).getName());
+				SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
@@ -690,8 +730,8 @@ public class SmssPage extends JFrame {
 			if(messageTextfield.getText().equals("")) {
 				throw(new InvalidInputException("Message name cannot be empty"));
 			}else {
-				ReceiverObject receiverObj = SmssController.getReceiverById(receivers.get(selectedReceiver1).getId());
-				SmssController.createMessage(messageTextfield.getText(), receiverObj.getId());
+				ReceiverObject receiverObj = SmssController.getReceiverByName(receivers.get(selectedReceiver1).getName());
+				SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();

@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.smss.model;
 import java.util.*;
 
-// line 50 "../../../../../SMSS.ump"
+// line 51 "../../../../../SMSS.ump"
 public class SpecificMessage
 {
 
