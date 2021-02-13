@@ -357,6 +357,10 @@ public class SmssController {
 		return SmssApplication.getSmss().getFragments();	
 	}
 	
+	public static Fragment getFragment(int fragmentId) {
+		return SmssApplication.getSmss().getFragments().get(fragmentId);	
+	}
+	
 	// CHECKERS--------------------------------------------------------------------------------------------------------------------------------
 
 	public static boolean hasSenderObject() throws InvalidInputException {
