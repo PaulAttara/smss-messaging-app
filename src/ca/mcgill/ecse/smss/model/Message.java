@@ -272,37 +272,48 @@ public class Message
   {
     return 0;
   }
-  /* Code from template association_AddManyToOptionalOne */
+  /* Code from template association_AddManyToManyMethod */
   public boolean addSpecificOperand(SpecificOperand aSpecificOperand)
   {
     boolean wasAdded = false;
     if (specificOperands.contains(aSpecificOperand)) { return false; }
-    Message existingMessage = aSpecificOperand.getMessage();
-    if (existingMessage == null)
+    specificOperands.add(aSpecificOperand);
+    if (aSpecificOperand.indexOfMessage(this) != -1)
     {
-      aSpecificOperand.setMessage(this);
-    }
-    else if (!this.equals(existingMessage))
-    {
-      existingMessage.removeSpecificOperand(aSpecificOperand);
-      addSpecificOperand(aSpecificOperand);
+      wasAdded = true;
     }
     else
     {
-      specificOperands.add(aSpecificOperand);
+      wasAdded = aSpecificOperand.addMessage(this);
+      if (!wasAdded)
+      {
+        specificOperands.remove(aSpecificOperand);
+      }
     }
-    wasAdded = true;
     return wasAdded;
   }
-
+  /* Code from template association_RemoveMany */
   public boolean removeSpecificOperand(SpecificOperand aSpecificOperand)
   {
     boolean wasRemoved = false;
-    if (specificOperands.contains(aSpecificOperand))
+    if (!specificOperands.contains(aSpecificOperand))
     {
-      specificOperands.remove(aSpecificOperand);
-      aSpecificOperand.setMessage(null);
+      return wasRemoved;
+    }
+
+    int oldIndex = specificOperands.indexOf(aSpecificOperand);
+    specificOperands.remove(oldIndex);
+    if (aSpecificOperand.indexOfMessage(this) == -1)
+    {
       wasRemoved = true;
+    }
+    else
+    {
+      wasRemoved = aSpecificOperand.removeMessage(this);
+      if (!wasRemoved)
+      {
+        specificOperands.add(oldIndex,aSpecificOperand);
+      }
     }
     return wasRemoved;
   }
@@ -358,9 +369,18 @@ public class Message
     {
       specificElements.get(0).setMessage(null);
     }
-    while( !specificOperands.isEmpty() )
+    ArrayList<SpecificOperand> copyOfSpecificOperands = new ArrayList<SpecificOperand>(specificOperands);
+    specificOperands.clear();
+    for(SpecificOperand aSpecificOperand : copyOfSpecificOperands)
     {
-      specificOperands.get(0).setMessage(null);
+      if (aSpecificOperand.numberOfMessages() <= SpecificOperand.minimumNumberOfMessages())
+      {
+        aSpecificOperand.delete();
+      }
+      else
+      {
+        aSpecificOperand.removeMessage(this);
+      }
     }
   }
 

@@ -66,6 +66,9 @@ public abstract class Fragment
     return aSpecificOperand;
   }
 
+  /**
+   * 0..* <@>- 2..* SpecificOperand;
+   */
   public List<SpecificOperand> getSpecificOperands()
   {
     List<SpecificOperand> newSpecificOperands = Collections.unmodifiableList(specificOperands);
@@ -283,13 +286,12 @@ public abstract class Fragment
 
   public void delete()
   {
-    while (specificOperands.size() > 0)
+    ArrayList<SpecificOperand> copyOfSpecificOperands = new ArrayList<SpecificOperand>(specificOperands);
+    specificOperands.clear();
+    for(SpecificOperand aSpecificOperand : copyOfSpecificOperands)
     {
-      SpecificOperand aSpecificOperand = specificOperands.get(specificOperands.size() - 1);
-      aSpecificOperand.delete();
-      specificOperands.remove(aSpecificOperand);
+      aSpecificOperand.removeFragment(this);
     }
-    
     SMSS placeholderSMSS = sMSS;
     this.sMSS = null;
     if(placeholderSMSS != null)

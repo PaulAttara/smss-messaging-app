@@ -22,7 +22,7 @@ public class SpecificOperand
   private int id;
 
   //SpecificOperand Associations
-  private Message message;
+  private List<Message> messages;
   private Operand operand;
   private List<Fragment> fragments;
 
@@ -30,9 +30,15 @@ public class SpecificOperand
   // CONSTRUCTOR
   //------------------------
 
-  public SpecificOperand(Operand aOperand)
+  public SpecificOperand(Operand aOperand, Message... allMessages)
   {
     id = nextId++;
+    messages = new ArrayList<Message>();
+    boolean didAddMessages = setMessages(allMessages);
+    if (!didAddMessages)
+    {
+      throw new RuntimeException("Unable to create SpecificOperand, must have at least 1 messages. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
+    }
     boolean didAddOperand = setOperand(aOperand);
     if (!didAddOperand)
     {
@@ -49,16 +55,35 @@ public class SpecificOperand
   {
     return id;
   }
-  /* Code from template association_GetOne */
-  public Message getMessage()
+  /* Code from template association_GetMany */
+  public Message getMessage(int index)
   {
-    return message;
+    Message aMessage = messages.get(index);
+    return aMessage;
   }
 
-  public boolean hasMessage()
+  public List<Message> getMessages()
   {
-    boolean has = message != null;
+    List<Message> newMessages = Collections.unmodifiableList(messages);
+    return newMessages;
+  }
+
+  public int numberOfMessages()
+  {
+    int number = messages.size();
+    return number;
+  }
+
+  public boolean hasMessages()
+  {
+    boolean has = messages.size() > 0;
     return has;
+  }
+
+  public int indexOfMessage(Message aMessage)
+  {
+    int index = messages.indexOf(aMessage);
+    return index;
   }
   /* Code from template association_GetOne */
   public Operand getOperand()
@@ -95,22 +120,139 @@ public class SpecificOperand
     int index = fragments.indexOf(aFragment);
     return index;
   }
-  /* Code from template association_SetOptionalOneToMany */
-  public boolean setMessage(Message aMessage)
+  /* Code from template association_IsNumberOfValidMethod */
+  public boolean isNumberOfMessagesValid()
+  {
+    boolean isValid = numberOfMessages() >= minimumNumberOfMessages();
+    return isValid;
+  }
+  /* Code from template association_MinimumNumberOfMethod */
+  public static int minimumNumberOfMessages()
+  {
+    return 1;
+  }
+  /* Code from template association_AddManyToManyMethod */
+  public boolean addMessage(Message aMessage)
+  {
+    boolean wasAdded = false;
+    if (messages.contains(aMessage)) { return false; }
+    messages.add(aMessage);
+    if (aMessage.indexOfSpecificOperand(this) != -1)
+    {
+      wasAdded = true;
+    }
+    else
+    {
+      wasAdded = aMessage.addSpecificOperand(this);
+      if (!wasAdded)
+      {
+        messages.remove(aMessage);
+      }
+    }
+    return wasAdded;
+  }
+  /* Code from template association_AddMStarToMany */
+  public boolean removeMessage(Message aMessage)
+  {
+    boolean wasRemoved = false;
+    if (!messages.contains(aMessage))
+    {
+      return wasRemoved;
+    }
+
+    if (numberOfMessages() <= minimumNumberOfMessages())
+    {
+      return wasRemoved;
+    }
+
+    int oldIndex = messages.indexOf(aMessage);
+    messages.remove(oldIndex);
+    if (aMessage.indexOfSpecificOperand(this) == -1)
+    {
+      wasRemoved = true;
+    }
+    else
+    {
+      wasRemoved = aMessage.removeSpecificOperand(this);
+      if (!wasRemoved)
+      {
+        messages.add(oldIndex,aMessage);
+      }
+    }
+    return wasRemoved;
+  }
+  /* Code from template association_SetMStarToMany */
+  public boolean setMessages(Message... newMessages)
   {
     boolean wasSet = false;
-    Message existingMessage = message;
-    message = aMessage;
-    if (existingMessage != null && !existingMessage.equals(aMessage))
+    ArrayList<Message> verifiedMessages = new ArrayList<Message>();
+    for (Message aMessage : newMessages)
     {
-      existingMessage.removeSpecificOperand(this);
+      if (verifiedMessages.contains(aMessage))
+      {
+        continue;
+      }
+      verifiedMessages.add(aMessage);
     }
-    if (aMessage != null)
+
+    if (verifiedMessages.size() != newMessages.length || verifiedMessages.size() < minimumNumberOfMessages())
     {
-      aMessage.addSpecificOperand(this);
+      return wasSet;
+    }
+
+    ArrayList<Message> oldMessages = new ArrayList<Message>(messages);
+    messages.clear();
+    for (Message aNewMessage : verifiedMessages)
+    {
+      messages.add(aNewMessage);
+      if (oldMessages.contains(aNewMessage))
+      {
+        oldMessages.remove(aNewMessage);
+      }
+      else
+      {
+        aNewMessage.addSpecificOperand(this);
+      }
+    }
+
+    for (Message anOldMessage : oldMessages)
+    {
+      anOldMessage.removeSpecificOperand(this);
     }
     wasSet = true;
     return wasSet;
+  }
+  /* Code from template association_AddIndexControlFunctions */
+  public boolean addMessageAt(Message aMessage, int index)
+  {  
+    boolean wasAdded = false;
+    if(addMessage(aMessage))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfMessages()) { index = numberOfMessages() - 1; }
+      messages.remove(aMessage);
+      messages.add(index, aMessage);
+      wasAdded = true;
+    }
+    return wasAdded;
+  }
+
+  public boolean addOrMoveMessageAt(Message aMessage, int index)
+  {
+    boolean wasAdded = false;
+    if(messages.contains(aMessage))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfMessages()) { index = numberOfMessages() - 1; }
+      messages.remove(aMessage);
+      messages.add(index, aMessage);
+      wasAdded = true;
+    } 
+    else 
+    {
+      wasAdded = addMessageAt(aMessage, index);
+    }
+    return wasAdded;
   }
   /* Code from template association_SetOneToMany */
   public boolean setOperand(Operand aOperand)
@@ -216,11 +358,11 @@ public class SpecificOperand
 
   public void delete()
   {
-    if (message != null)
+    ArrayList<Message> copyOfMessages = new ArrayList<Message>(messages);
+    messages.clear();
+    for(Message aMessage : copyOfMessages)
     {
-      Message placeholderMessage = message;
-      this.message = null;
-      placeholderMessage.removeSpecificOperand(this);
+      aMessage.removeSpecificOperand(this);
     }
     Operand placeholderOperand = operand;
     this.operand = null;
@@ -248,7 +390,6 @@ public class SpecificOperand
   {
     return super.toString() + "["+
             "id" + ":" + getId()+ "]" + System.getProperties().getProperty("line.separator") +
-            "  " + "message = "+(getMessage()!=null?Integer.toHexString(System.identityHashCode(getMessage())):"null") + System.getProperties().getProperty("line.separator") +
             "  " + "operand = "+(getOperand()!=null?Integer.toHexString(System.identityHashCode(getOperand())):"null");
   }
 }

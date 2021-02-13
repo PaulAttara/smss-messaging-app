@@ -91,22 +91,35 @@ public class SmssController {
 	public static void createFragment(String fragmentType, List<SpecificOperand> specificOperands) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
 		try {
+			if(specificOperands.size() < 2) {
+				throw(new InvalidInputException("Need at least 2 operands"));
+			}else {
 			SpecificElement specificElement = new SpecificElement(smss.getMethod());
 			
 			// alternative fragment
 			if(fragmentType == "alt") {
-				AlternativeFragment frag = new AlternativeFragment(smss, specificElement, specificOperands);
+				AlternativeFragment frag = new AlternativeFragment(smss, specificElement, specificOperands.get(0), specificOperands.get(1));
+				if(specificOperands.size() > 2) {
+					for(int i = 2; i < specificOperands.size(); i++) {
+						frag.addSpecificOperand(specificOperands.get(i));
+					}
+				}
 				specificElement.setFragment(frag);
 			}
 			// parallel fragment
 			else {
-				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificOperands);
+				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificOperands.get(0), specificOperands.get(1));
+				if(specificOperands.size() > 2) {
+					for(int i = 2; i < specificOperands.size(); i++) {
+						frag.addSpecificOperand(specificOperands.get(i));
+					}
+				}
 				specificElement.setFragment(frag);
-				SmssApplication.getSmss().getMethod().addSpecificElement(specificElement);
 			}
-			
+			SmssApplication.getSmss().getMethod().addSpecificElement(specificElement);
 			// QUESTION: DOES THE COMPOSITION FROM SMSS TO FRAGMENT MESS UP WITH THIS? so far, no!
 			smss.getMethod().addSpecificElement(specificElement);
+			}
 		}
 		catch (RuntimeException e) {
 			throw new InvalidInputException(e.getMessage());
@@ -142,14 +155,19 @@ public class SmssController {
 			Operand operand = new Operand(condition, smss);
 			smss.addOperand(operand);
 			SpecificOperand specificOperand = new SpecificOperand(operand);
+			for(Message m : messages) {
+				specificOperand.addMessage(m);
+			}
+			specificOperand.setOperand(operand);
 			
 		}
 		catch (RuntimeException e) {
 			throw new InvalidInputException(e.getMessage());
 		}
 	}
-	//messasges list then create operand
 	
+	//messasges list then create operand
+	// specific operand.getmesaages
 			
 	
 
@@ -305,13 +323,29 @@ public class SmssController {
 		}
 		return null;
 	}
+	//TODO
+	// get specific operand and get fragment
+	
+	public static SpecificOperand getSpecificOperand(int specificOperandId) {
+		
+		List<Operand> operands = SmssApplication.getSmss().getOperands();
+	
+		for(Operand operand : operands) {
+			for(SpecificOperand s : operand.getSpecificOperands()) {
+				if(specificOperandId == s.getId()) {
+					return s;
+				}
+			}
+		}
+		return null;
+	}
 	
 	public static List<Fragment> getFragments() {
 		return SmssApplication.getSmss().getFragments();	
 	}
 	
 	// CHECKERS--------------------------------------------------------------------------------------------------------------------------------
-	
+
 	public static boolean hasSenderObject() throws InvalidInputException {
 		// get all objects
 		if(SmssController.getClassTypes().size() == 0) {
@@ -361,6 +395,18 @@ public class SmssController {
 			throw new InvalidInputException(e.getMessage());
 		}
 	}
+	
+	public static boolean hasSpecificOperands() throws InvalidInputException {
+		int count = 0;
+		List<Operand> operands = SmssApplication.getSmss().getOperands();
+		for(Operand operand : operands) {
+			if(operand.hasSpecificOperands()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 	
 	
