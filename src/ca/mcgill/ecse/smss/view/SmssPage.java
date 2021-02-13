@@ -16,6 +16,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
@@ -30,6 +31,7 @@ import javax.swing.table.TableCellRenderer;
 import ca.mcgill.ecse.smss.controller.SmssController;
 import ca.mcgill.ecse.smss.model.SMSS;
 import ca.mcgill.ecse.smss.model.SenderObject;
+import ca.mcgill.ecse.smss.model.SpecificOperand;
 import ca.mcgill.ecse.smss.model.ClassType;
 import ca.mcgill.ecse.smss.model.Message;
 import ca.mcgill.ecse.smss.model.Operand;
@@ -198,20 +200,15 @@ public class SmssPage extends JFrame {
 		});
 		
 		// elements for message
+		
 		messageLabel = new JLabel();
 		senderDropdown = new JComboBox<String>(new String[0]);
 		messageTextfield = new JTextField();
 		createMessageButton = new JButton();
 		
-		// elements for message pane list
-//		messageList = new ArrayList<>();
 		messageList1 = new JList<>(listModelMessages);
-        messageList1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
-
-        messageList1.setSelectedIndex(0);
-        //messageList1.addMessageListSelectionListener(this);
-        messageList1.setVisibleRowCount(5);
-        JScrollPane messageListScrollPane = new JScrollPane(messageList1);
+        messageList1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        messageListScrollPane = new JScrollPane(messageList1);
         
         
 		// elements for operand
@@ -223,10 +220,6 @@ public class SmssPage extends JFrame {
 		// elements for operand pane list
 		operandList = new JList<>(listModelOperands);
 		operandList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
-		
-		operandList.setSelectedIndex(0);
-		//operandList.addOperandListSelectionListener(this);
-		operandList.setVisibleRowCount(5);
         JScrollPane operandListScrollPane = new JScrollPane(operandList);
 		
         // elements for fragment
@@ -385,7 +378,7 @@ public class SmssPage extends JFrame {
 										.addComponent(classCreateButton, 200, 200, 400)
 										.addComponent(classTypesDropdown2, 200, 200, 400)
 										.addComponent(messageTextfield, 200, 200, 400)
-										.addComponent(messageListScrollPane, 200, 200, 400)
+										.addComponent(messageListScrollPane)
 										.addComponent(operandListScrollPane, 200, 200, 400))
 								.addGroup(layout.createParallelGroup()
 										.addComponent(emptyLabel, 200, 200, 400)
@@ -526,17 +519,25 @@ public class SmssPage extends JFrame {
 			
 			if(SmssController.hasMessages()) 
 			{
-				listModelMessages = new DefaultListModel<>();
+				listModelMessages.removeAllElements();
 				for (Message message : SmssController.getMessages()) {
 					listModelMessages.addElement(message.getName());
+
 				};
-		        messageList1.setSelectedIndex(-1);
-		        messageListScrollPane = new JScrollPane(messageList1);
 			}
 			
+			if(SmssController.hasSpecificOperands()) 
+			{
+				listModelOperands.removeAllElements();
+				for (SpecificOperand specificOperand : SmssController.getSpecificOperands()) {
+					//String stringbuild = String.valueof(specificOperand.getId()) + " operand" + "/ condition: [" + specificOperand.getCondition() + "] / Message Count:" + specificOperand.getMessages().size();
+					//listModelOperands.addElement(stringbuild);
+				};
+			}
+		
 		}
 		catch(InvalidInputException e) {
-			error = e.getMessage();
+			error = e.getMessage(); 
 		}
 
 		
@@ -705,19 +706,10 @@ public class SmssPage extends JFrame {
 		// clear error message	
 		error = null;
 		
-		// call the controller
-		try {
-			if(operandCondition.getText().equals("")) {
-				throw(new InvalidInputException("Message name cannot be empty"));
-			}else {
-				ReceiverObject receiverObj = SmssController.getReceiverByName(receivers.get(selectedReceiver1).getName());
-				SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
-			}
-		} catch (InvalidInputException e) {
-			error = e.getMessage();
-		}
-
-		// update visuals
+		//call the controller
+		//SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
+			
+		//update visuals
 		refreshData();
 	}
 	
