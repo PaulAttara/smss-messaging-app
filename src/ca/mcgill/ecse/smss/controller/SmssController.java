@@ -96,11 +96,13 @@ public class SmssController {
 			// alternative fragment
 			if(fragmentType == "alt") {
 				AlternativeFragment frag = new AlternativeFragment(smss, specificElement, specificOperands);
-				
+				specificElement.setFragment(frag);
 			}
 			// parallel fragment
 			else {
 				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificOperands);
+				specificElement.setFragment(frag);
+				SmssApplication.getSmss().getMethod().addSpecificElement(specificElement);
 			}
 			
 			// QUESTION: DOES THE COMPOSITION FROM SMSS TO FRAGMENT MESS UP WITH THIS? so far, no!
@@ -111,7 +113,30 @@ public class SmssController {
 		}
 	}
 	
-	public static void createOperand(String condition, List<Message> messages) throws InvalidInputException {
+//	public static void createSpecificElement(String fragmentType, List<SpecificOperand> specificOperands) throws InvalidInputException {
+//		SMSS smss = SmssApplication.getSmss();
+//		try {
+//			SpecificElement specificElement = new SpecificElement(smss.getMethod());
+//			
+//			// alternative fragment
+//			if(fragmentType == "alt") {
+//				AlternativeFragment frag = new AlternativeFragment(smss, specificElement, specificOperands);
+//				
+//			}
+//			// parallel fragment
+//			else {
+//				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificOperands);
+//			}
+//			
+//			// QUESTION: DOES THE COMPOSITION FROM SMSS TO FRAGMENT MESS UP WITH THIS? so far, no!
+//			smss.getMethod().addSpecificElement(specificElement);
+//		}
+//		catch (RuntimeException e) {
+//			throw new InvalidInputException(e.getMessage());
+//		}
+//	}
+	
+	public static void createSpecificOperand(String condition, List<Message> messages) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
 		try {
 			Operand operand = new Operand(condition, smss);
