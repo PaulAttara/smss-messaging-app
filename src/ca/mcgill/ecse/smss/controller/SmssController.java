@@ -123,6 +123,32 @@ public class SmssController {
 			throw new InvalidInputException(e.getMessage());
 		}
 	}
+	// 1- 1 message
+	// 2- 1 fragment
+	// has specific fragments
+	
+	
+	public static void createSpecificElement(Message message) throws InvalidInputException {
+		SMSS smss = SmssApplication.getSmss();
+		try {
+			SpecificElement specificElement = new SpecificElement(smss.getMethod());
+			specificElement.setMessage(message);
+		}
+		catch (RuntimeException e) {
+			throw new InvalidInputException(e.getMessage());
+		}
+	}
+	
+	public static void createSpecificElement(Fragment fragment) throws InvalidInputException {
+		SMSS smss = SmssApplication.getSmss();
+		try {
+			SpecificElement specificElement = new SpecificElement(smss.getMethod());
+			specificElement.setFragment(fragment);
+		}
+		catch (RuntimeException e) {
+			throw new InvalidInputException(e.getMessage());
+		}
+	}
 	
 	public static void createSpecificOperand(String condition, List<Message> messages) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
@@ -208,7 +234,6 @@ public class SmssController {
 		return SmssApplication.getSmss().getClassTypes();
 	}
 	
-	// this method is used for testing, not needed for ui, use the other getReceivers for ui
 	public static List<ReceiverObject> getReceivers() { 
 		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
 		
@@ -222,20 +247,8 @@ public class SmssController {
 		}
 		return receivers;
 	}
-	public static HashMap<Integer, ReceiverObject> getReceiversHash() {
-		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
-		
-		HashMap<Integer, ReceiverObject> receivers = new HashMap<>();
-		
-		for(Object r : objects) {
-			if(r instanceof ReceiverObject) {
-				ReceiverObject receiver = (ReceiverObject) r;
-				//receivers.put(receiver.getId(), receiver);
-			}
-		}
-		return receivers;
-	}
-	public static ReceiverObject getReceiverByName(String receiverName) {
+	
+	public static ReceiverObject getReceiverByName(String receiverName) throws InvalidInputException {
 		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
 				
 		for(Object r : objects) {
@@ -243,8 +256,7 @@ public class SmssController {
 				return (ReceiverObject) r;
 			}
 		}
-		// return error message saying to add a sender!!
-		return null;
+		throw new InvalidInputException("No sender created");		
 	}
 	
 	public static List<Message> getMessages() throws InvalidInputException {
@@ -376,26 +388,7 @@ public class SmssController {
 		return false;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	public static boolean hasSpecificElements() throws InvalidInputException {
+		return SmssApplication.getSmss().getMethod().getSpecificElements().size() > 0;
+	}
 }
