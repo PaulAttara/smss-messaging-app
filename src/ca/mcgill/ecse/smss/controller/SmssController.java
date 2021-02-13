@@ -68,14 +68,12 @@ public class SmssController {
 	public static void createReceiver(String className, String receiverName) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
 		try {
-			
-			smss.getClassType(0).addObject(new ReceiverObject(getClassTypeByName(className), receiverName));
+			getClassTypeByName(className).addObject(new ReceiverObject(getClassTypeByName(className), receiverName));
 		}
 		catch (RuntimeException e) {
 			throw new InvalidInputException(e.getMessage());
 		}
 	}
-	
 	
 	public static void createMessage(String messageName, String receiverName) throws InvalidInputException {
 		SMSS smss = SmssApplication.getSmss();
@@ -235,14 +233,14 @@ public class SmssController {
 	}
 	
 	public static List<ReceiverObject> getReceivers() { 
-		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
 		
+		List<ClassType> classes = SmssApplication.getSmss().getClassTypes();
 		List<ReceiverObject> receivers = new ArrayList<>();
-		
-		for(Object r : objects) {
-			if(r instanceof ReceiverObject) {
-				ReceiverObject receiver = (ReceiverObject) r;
-				receivers.add((ReceiverObject) r);
+		for(ClassType c : classes) {
+			for(Object r : c.getObjects()) {
+				if(r instanceof ReceiverObject) {
+					receivers.add((ReceiverObject) r);
+				}
 			}
 		}
 		return receivers;
