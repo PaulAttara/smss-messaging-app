@@ -33,6 +33,7 @@ import ca.mcgill.ecse.smss.model.SMSS;
 import ca.mcgill.ecse.smss.model.SenderObject;
 import ca.mcgill.ecse.smss.model.SpecificOperand;
 import ca.mcgill.ecse.smss.model.ClassType;
+import ca.mcgill.ecse.smss.model.Fragment;
 import ca.mcgill.ecse.smss.model.Message;
 import ca.mcgill.ecse.smss.model.Operand;
 import ca.mcgill.ecse.smss.model.ReceiverObject;
@@ -113,7 +114,17 @@ public class SmssPage extends JFrame {
 	private JScrollPane overviewScrollPane;
 	private DefaultTableModel overviewDtm;
 	private String overviewColumnNames[] = {"Editor"};
+	
 	private static final int HEIGHT_OVERVIEW_TABLE = 200;
+	
+	private JComboBox<String> fragmentDropdown;
+	private JButton addFragmentToEditorButton;
+
+	private JComboBox<String> messagesDropdown;
+	private JButton addMessageToEditorButton;
+	
+	private int selectedFragmentToEditor = -1;
+	private int selectedMessageToEditor = -1;
 	
 	
 	// Data Elements
@@ -230,12 +241,48 @@ public class SmssPage extends JFrame {
 		fragmentTypeDropdown.addItem("Alternative");
 		createFragmentButton = new JButton();
 		
+		
+		
+		fragmentDropdown = new JComboBox<String>(new String[0]);
+		messagesDropdown = new JComboBox<String>(new String[0]);
+		
+		fragmentDropdown.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+		        JComboBox<String> cb = (JComboBox<String>) evt.getSource();
+		        selectedFragmentToEditor = cb.getSelectedIndex();
+			}
+		});
+		
+		messagesDropdown.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+		        JComboBox<String> cb = (JComboBox<String>) evt.getSource();
+		        selectedMessageToEditor = cb.getSelectedIndex();
+			}
+		});
+		
+		
+		addFragmentToEditorButton = new JButton();
+		addMessageToEditorButton = new JButton();
+		
 		// global settings and listeners
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setTitle("SMSS Application");
 		
 		emptyLabel.setText("");
 
+		addFragmentToEditorButton.setText("Add Fragment to Editor");
+		addFragmentToEditorButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				addFragmentToEditorButtonActionPerformed(evt);
+			}
+		});
+		
+		addMessageToEditorButton.setText("Add Message to Editor");
+		addMessageToEditorButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				addMessageToEditorButtonActionPerformed(evt);
+			}
+		});
 		// for method
 		smssLabel.setText("SMSS Class Name: ");
 		smssCreateButton.setText("Create SMSS");
@@ -338,6 +385,8 @@ public class SmssPage extends JFrame {
 		JSeparator horizontalLineTop = new JSeparator();
 		JSeparator horizontalLineMiddle = new JSeparator();
 		JSeparator horizontalLineBottom = new JSeparator();
+		JSeparator horizontalLineLast = new JSeparator();
+
 
 		// layout
 		GroupLayout layout = new GroupLayout(getContentPane());
@@ -351,6 +400,7 @@ public class SmssPage extends JFrame {
 						.addComponent(horizontalLineTop)
 						.addComponent(horizontalLineMiddle)
 						.addComponent(horizontalLineBottom)
+						.addComponent(horizontalLineLast)
 						.addComponent(overviewScrollPane)
 						.addGroup(layout.createSequentialGroup()
 								.addGroup(layout.createParallelGroup()
@@ -361,7 +411,9 @@ public class SmssPage extends JFrame {
 										.addComponent(receiverLabel)
 										.addComponent(messageLabel)
 										.addComponent(operandLabel)
-										.addComponent(fragmentLabel))
+										.addComponent(fragmentLabel)
+										.addComponent(emptyLabel, 200, 200, 400)
+										.addComponent(emptyLabel, 200, 200, 400))
 								.addGroup(layout.createParallelGroup()
 										.addComponent(smssTextField, 200, 200, 400)
 										.addComponent(methodTextField, 200, 200, 400)
@@ -370,7 +422,9 @@ public class SmssPage extends JFrame {
 										.addComponent(receiverTextField, 200, 200, 400)
 										.addComponent(senderDropdown, 200, 200, 400)
 										.addComponent(operandCondition, 200, 200, 400)
-										.addComponent(fragmentTypeDropdown, 200, 200, 400))
+										.addComponent(fragmentTypeDropdown, 200, 200, 400)
+										.addComponent(emptyLabel, 200, 200, 400)
+										.addComponent(emptyLabel, 200, 200, 400))
 								.addGroup(layout.createParallelGroup()
 										.addComponent(smssCreateButton, 200, 200, 400)
 										.addComponent(methodCreateButton, 200, 200, 400)
@@ -379,7 +433,11 @@ public class SmssPage extends JFrame {
 										.addComponent(classTypesDropdown2, 200, 200, 400)
 										.addComponent(messageTextfield, 200, 200, 400)
 										.addComponent(messageListScrollPane)
-										.addComponent(operandListScrollPane, 200, 200, 400))
+										.addComponent(operandListScrollPane, 200, 200, 400)
+										.addComponent(fragmentDropdown, 400, 400, 400)
+										.addComponent(messagesDropdown, 400, 400, 400)
+
+										)
 								.addGroup(layout.createParallelGroup()
 										.addComponent(emptyLabel, 200, 200, 400)
 										.addComponent(emptyLabel, 200, 200, 400)
@@ -388,7 +446,11 @@ public class SmssPage extends JFrame {
 										.addComponent(createReceiverButton, 200, 200, 400)
 										.addComponent(receiverDropdown2, 200, 200, 400)
 										.addComponent(createOperandButton, 200, 200, 400)
-										.addComponent(createFragmentButton, 200, 200, 400))
+										.addComponent(createFragmentButton, 200, 200, 400)
+										.addComponent(addFragmentToEditorButton, 200, 200, 400)
+										.addComponent(addMessageToEditorButton, 200, 200, 400)
+
+										)
 								.addGroup(layout.createParallelGroup()
 										.addComponent(emptyLabel, 200, 200, 400)
 										.addComponent(emptyLabel, 200, 200, 400)
@@ -398,7 +460,8 @@ public class SmssPage extends JFrame {
 										.addComponent(createMessageButton, 200, 200, 400)
 										.addComponent(emptyLabel, 200, 200, 400)
 										.addComponent(emptyLabel, 200, 200, 400))
-										
+								.addComponent(emptyLabel, 200, 200, 400)
+								.addComponent(emptyLabel, 200, 200, 400)
 										)));
 		layout.setVerticalGroup(
 				layout.createParallelGroup()
@@ -458,8 +521,21 @@ public class SmssPage extends JFrame {
 								.addComponent(emptyLabel))
 						.addGroup(layout.createParallelGroup()
 								.addComponent(horizontalLineBottom))
+						.addGroup(layout.createParallelGroup()
+								.addComponent(emptyLabel)
+								.addComponent(emptyLabel)
+								.addComponent(fragmentDropdown)
+								.addComponent(addFragmentToEditorButton)
+								.addComponent(emptyLabel))
+						.addGroup(layout.createParallelGroup()
+								.addComponent(emptyLabel)
+								.addComponent(emptyLabel)
+								.addComponent(messagesDropdown)
+								.addComponent(addMessageToEditorButton)
+								.addComponent(emptyLabel))
 						.addComponent(overviewScrollPane))
-				
+				.addGroup(layout.createParallelGroup()
+						.addComponent(horizontalLineLast))
 				);
 		methodCreateButton.setEnabled(false);
 		senderCreateButton.setEnabled(false);
@@ -519,9 +595,12 @@ public class SmssPage extends JFrame {
 			
 			if(SmssController.hasMessages()) 
 			{
+				messagesDropdown.removeAllItems();
 				listModelMessages.removeAllElements();
 				for (Message message : SmssController.getMessages()) {
-					listModelMessages.addElement(message.getName());
+					String msgstring = message.getSenderObject().getName() + "--" + message.getName() + "-->" + message.getReceiverObject().getName() + ":" + message.getReceiverObject().getClassType().getName() ;
+					messagesDropdown.addItem(msgstring);
+					listModelMessages.addElement(msgstring);
 
 				};
 			}
@@ -530,8 +609,17 @@ public class SmssPage extends JFrame {
 			{
 				listModelOperands.removeAllElements();
 				for (SpecificOperand specificOperand : SmssController.getSpecificOperands()) {
-					String stringbuild = specificOperand.getId() + " operand" + "/ condition: [" + specificOperand.getOperand().getCondition() + "] / Message Count:" + specificOperand.getMessages().size();
+					String stringbuild = "Operand" + specificOperand.getId() + "/ Condition: [" + specificOperand.getOperand().getCondition() + "] / Message Count:" + specificOperand.getMessages().size();
 					listModelOperands.addElement(stringbuild);
+				};
+			}
+			
+			if(SmssController.hasFragments()) 
+			{
+				fragmentDropdown.removeAllItems();
+				for (Fragment fragment : SmssController.getFragments()) {
+					String stringbuild = "Fragment " + fragment.getId() + ": " + fragment.getClass() + "/ Operands: " + fragment.getSpecificOperands().size();
+					fragmentDropdown.addItem(stringbuild);
 				};
 			}
 		
@@ -554,6 +642,8 @@ public class SmssPage extends JFrame {
 			Object[] obj = {"   " + SmssController.getMethodName()};
 			overviewDtm.addRow(obj);
 		}
+		
+	
 			
 				/*for (RouteAssignment assignment : BtmsController.getAssignmentsForDate((Date) overviewDatePicker.getModel().getValue())) {
 						BusVehicle bus = assignment.getBus();
@@ -673,6 +763,7 @@ public class SmssPage extends JFrame {
 			}
 			else {
 				ClassType classType = SmssController.getClassTypeByName(classes.get(selectedClassType2).getName());
+				System.out.print(classType.getName());
 				SmssController.createReceiver(classType.getName(), receiverTextField.getText());
 			}
 		} catch (InvalidInputException e) {
@@ -696,6 +787,9 @@ public class SmssPage extends JFrame {
 				throw(new InvalidInputException("Receiver must be selected"));
 			}else {
 				ReceiverObject receiverObj = SmssController.getReceiverByName(receivers.get(selectedReceiver2).getName());
+				System.out.print(receiverObj.getClassType().getName());
+				System.out.print(receiverObj.getClassType().getName());
+
 				SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
 			}
 		} catch (InvalidInputException e) {
@@ -762,7 +856,50 @@ public class SmssPage extends JFrame {
 		// update visuals
 		refreshData();
 	}
+	
+	private void addFragmentToEditorButtonActionPerformed(ActionEvent evt) {
+		// clear error message	
+		error = null;
+		try{
+			
+		List<String> selectedValues = messageList1.getSelectedValuesList();
+		List<Message> messages = new ArrayList<>();
+
+		for(String value: selectedValues) {
+			messages.add(SmssController.getMessageByName(value));
+		}
 		
+		//call the controller
+		SmssController.createSpecificOperand(operandCondition.getText(), messages);
+		}catch (InvalidInputException e) {
+			error = e.getMessage();
+		}
+			
+		//update visuals
+		refreshData();
+	}
+	
+	private void addMessageToEditorButtonActionPerformed(ActionEvent evt) {
+		// clear error message	
+		error = null;
+		try{
+			
+		List<String> selectedValues = messageList1.getSelectedValuesList();
+		List<Message> messages = new ArrayList<>();
+
+		for(String value: selectedValues) {
+			messages.add(SmssController.getMessageByName(value));
+		}
+		
+		//call the controller
+		SmssController.createSpecificOperand(operandCondition.getText(), messages);
+		}catch (InvalidInputException e) {
+			error = e.getMessage();
+		}
+			
+		//update visuals
+		refreshData();
+	}
 
 
 }
