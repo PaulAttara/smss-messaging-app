@@ -246,20 +246,24 @@ public class SmssController {
 				}
 			}
 		}
-		System.out.println(receivers.size());
 		return receivers;
 	}
 	
+	
 	public static ReceiverObject getReceiverByName(String receiverName) throws InvalidInputException {
-		List<ca.mcgill.ecse.smss.model.Object> objects = SmssApplication.getSmss().getClassType(0).getObjects();
-				
-		for(Object r : objects) {
-			if(r instanceof ReceiverObject && ((ReceiverObject) r).getName() == receiverName) {
-				return (ReceiverObject) r;
+		
+		List<ClassType> classes = SmssApplication.getSmss().getClassTypes();
+		List<ReceiverObject> receivers = new ArrayList<>();
+		for(ClassType c : classes) {
+			for(Object r : c.getObjects()) {
+				if(r instanceof ReceiverObject && ((ReceiverObject) r).getName() == receiverName) {
+					return (ReceiverObject) r;
+				}
 			}
 		}
-		throw new InvalidInputException("No sender created");		
+		return null;
 	}
+	
 	
 	public static List<Message> getMessages() throws InvalidInputException {
 		try {
@@ -358,11 +362,11 @@ public class SmssController {
 		}
 		else {
 			List<ClassType> classes = SmssApplication.getSmss().getClassTypes();
-			List<ReceiverObject> receivers = new ArrayList<>();
 			for(ClassType c : classes) {
 				for(Object r : c.getObjects()) {
 					if(r instanceof ReceiverObject) {
-return true;					}
+						return true;					
+					}
 				}
 			}
 		return false;
