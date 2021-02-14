@@ -343,7 +343,7 @@ public class SmssPage extends JFrame {
 		});		
 
 		// for operand
-		operandLabel.setText("Operand:");
+		operandLabel.setText("Operand: " + "\n" + "(Text box is to specify operand, \n leave empty if no condition)");
 		createOperandButton.setText("Create Operand");
 		createOperandButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
