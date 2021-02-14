@@ -74,29 +74,19 @@ public class SpecificElement
   {
     return method;
   }
-  /* Code from template association_SetOptionalOneToOne */
-  public boolean setFragment(Fragment aNewFragment)
+  /* Code from template association_SetOptionalOneToMany */
+  public boolean setFragment(Fragment aFragment)
   {
     boolean wasSet = false;
-    if (fragment != null && !fragment.equals(aNewFragment) && equals(fragment.getSpecificElement()))
+    Fragment existingFragment = fragment;
+    fragment = aFragment;
+    if (existingFragment != null && !existingFragment.equals(aFragment))
     {
-      //Unable to setFragment, as existing fragment would become an orphan
-      return wasSet;
+      existingFragment.removeSpecificElement(this);
     }
-
-    fragment = aNewFragment;
-    SpecificElement anOldSpecificElement = aNewFragment != null ? aNewFragment.getSpecificElement() : null;
-
-    if (!this.equals(anOldSpecificElement))
+    if (aFragment != null)
     {
-      if (anOldSpecificElement != null)
-      {
-        anOldSpecificElement.fragment = null;
-      }
-      if (fragment != null)
-      {
-        fragment.setSpecificElement(this);
-      }
+      aFragment.addSpecificElement(this);
     }
     wasSet = true;
     return wasSet;
@@ -140,11 +130,11 @@ public class SpecificElement
 
   public void delete()
   {
-    Fragment existingFragment = fragment;
-    fragment = null;
-    if (existingFragment != null)
+    if (fragment != null)
     {
-      existingFragment.delete();
+      Fragment placeholderFragment = fragment;
+      this.fragment = null;
+      placeholderFragment.removeSpecificElement(this);
     }
     if (message != null)
     {

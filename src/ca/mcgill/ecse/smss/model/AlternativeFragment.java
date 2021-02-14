@@ -16,9 +16,9 @@ public class AlternativeFragment extends Fragment
   // CONSTRUCTOR
   //------------------------
 
-  public AlternativeFragment(SMSS aSMSS, SpecificElement aSpecificElement, SpecificOperand... allSpecificOperands)
+  public AlternativeFragment(SMSS aSMSS, SpecificOperand... allSpecificOperands)
   {
-    super(aSMSS, aSpecificElement, allSpecificOperands);
+    super(aSMSS, allSpecificOperands);
   }
 
   //------------------------

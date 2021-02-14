@@ -69,9 +69,6 @@ public class SmssController {
 		SMSS smss = SmssApplication.getSmss();
 		try {
 			getClassTypeByName(className).addObject(new ReceiverObject(getClassTypeByName(className), receiverName));
-			System.out.println(getClassTypeByName(className));
-			System.out.println(getClassTypeByName(className).getObjects());
-
 		}
 		catch (RuntimeException e) {
 			throw new InvalidInputException(e.getMessage());
@@ -95,29 +92,27 @@ public class SmssController {
 			if(specificOperands.size() < 2) {
 				throw(new InvalidInputException("Need at least 2 operands"));
 			}else {
-			SpecificElement specificElement = new SpecificElement(smss.getMethod());
 			
 			// alternative fragment
 			if(fragmentType == "Alternative") {
-				AlternativeFragment frag = new AlternativeFragment(smss, specificElement, specificOperands.get(0), specificOperands.get(1));
+				AlternativeFragment frag = new AlternativeFragment(smss, specificOperands.get(0), specificOperands.get(1));
 				if(specificOperands.size() > 2) {
-					for(int i = 2; i < specificOperands.size(); i++) {
+					for(int i = 2; i < specificOperands.size() - 1; i++) {
 						frag.addSpecificOperand(specificOperands.get(i));
 					}
 				}
-				specificElement.setFragment(frag);
+				smss.addFragment(frag);
 			}
 			// parallel fragment
 			else if(fragmentType == "Parallel"){
-				ParallelFragment frag = new ParallelFragment(smss, specificElement, specificOperands.get(0), specificOperands.get(1));
+				ParallelFragment frag = new ParallelFragment(smss, specificOperands.get(0), specificOperands.get(1));
 				if(specificOperands.size() > 2) {
-					for(int i = 2; i < specificOperands.size(); i++) {
+					for(int i = 2; i < specificOperands.size() - 1; i++) {
 						frag.addSpecificOperand(specificOperands.get(i));
 					}
 				}
-				specificElement.setFragment(frag);
+				smss.addFragment(frag);
 			}
-			smss.getMethod().addSpecificElement(specificElement);
 			}
 		}
 		catch (RuntimeException e) {
@@ -167,7 +162,11 @@ public class SmssController {
 			throw new InvalidInputException(e.getMessage());
 		}
 	}
-	
+	// DELETERS--------------------------------------------------------------------------------------------------------------------------------
+	public static void removeLastSpecificElement() throws InvalidInputException {
+		int indexToDelete = SmssApplication.getSmss().getMethod().getSpecificElements().size() - 1;
+		SmssApplication.getSmss().getMethod().getSpecificElement(indexToDelete).delete();
+	}
 	// GETTERS--------------------------------------------------------------------------------------------------------------------------------
 
 	public static String getSmssClass(int index) {
@@ -329,7 +328,12 @@ public class SmssController {
 	}
 	
 	public static Fragment getFragment(int fragmentId) {
-		return SmssApplication.getSmss().getFragments().get(fragmentId);	
+		for(Fragment frag : SmssApplication.getSmss().getFragments()) {
+			if(frag.getId() == fragmentId) {
+				return frag;
+			}
+		}
+		return null;
 	}
 	
 	// CHECKERS--------------------------------------------------------------------------------------------------------------------------------

@@ -16,9 +16,9 @@ public class ParallelFragment extends Fragment
   // CONSTRUCTOR
   //------------------------
 
-  public ParallelFragment(SMSS aSMSS, SpecificElement aSpecificElement, SpecificOperand... allSpecificOperands)
+  public ParallelFragment(SMSS aSMSS, SpecificOperand... allSpecificOperands)
   {
-    super(aSMSS, aSpecificElement, allSpecificOperands);
+    super(aSMSS, allSpecificOperands);
   }
 
   //------------------------

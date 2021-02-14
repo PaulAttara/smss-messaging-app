@@ -45,15 +45,9 @@ public class SmssPage extends JFrame {
 	
 	private static final long serialVersionUID = -4426310869335015542L;
 	
-	// UI elements
+	// Error
 	private JLabel errorMessage;	
 	
-	// SMSS: going to remove smss category completely: no need for it.
-//	private JLabel ssmsLabel;
-//	private JTextField ssmsNameTextField;
-//	private JButton ssmsCreateButton;
-//	private JLabel ssmsNameLabel;
-
 	// Method
 	private JLabel smssLabel;
 	private JTextField smssTextField;
@@ -115,6 +109,7 @@ public class SmssPage extends JFrame {
 	private JScrollPane overviewScrollPane;
 	private DefaultTableModel overviewDtm;
 	private String overviewColumnNames[] = {"Editor"};
+	private JButton removeLastEditorElementButton;
 	
 	private static final int HEIGHT_OVERVIEW_TABLE = 200;
 	
@@ -266,6 +261,7 @@ public class SmssPage extends JFrame {
 		
 		addFragmentToEditorButton = new JButton();
 		addMessageToEditorButton = new JButton();
+		removeLastEditorElementButton = new JButton();
 		
 		// global settings and listeners
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -286,14 +282,18 @@ public class SmssPage extends JFrame {
 				addMessageToEditorButtonActionPerformed(evt);
 			}
 		});
+		removeLastEditorElementButton.setText("Remove Last Editor Element");
+		removeLastEditorElementButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				removeLastEditorElementButtonActionPerformed(evt);
+			}
+		});
 		// for method
 		smssLabel.setText("SMSS Class Name: ");
 		smssCreateButton.setText("Create SMSS");
 		smssCreateButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				createSMSSButtonActionPerformed(evt);
-				methodCreateButton.setEnabled(true);
-				senderCreateButton.setEnabled(true);
 			}
 		});
 		
@@ -383,6 +383,7 @@ public class SmssPage extends JFrame {
 		Dimension d = overviewTable.getPreferredSize();
 		overviewScrollPane.setPreferredSize(new Dimension(d.width, HEIGHT_OVERVIEW_TABLE));
 		overviewScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		overviewTable.setDefaultEditor(Object.class, null);
 		
 		// horizontal line elements
 		JSeparator horizontalLineTop = new JSeparator();
@@ -464,7 +465,7 @@ public class SmssPage extends JFrame {
 										.addComponent(emptyLabel, 200, 200, 400)
 										.addComponent(emptyLabel, 200, 200, 400))
 								.addComponent(emptyLabel, 200, 200, 400)
-								.addComponent(emptyLabel, 200, 200, 400)
+								.addComponent(removeLastEditorElementButton, 200, 200, 400)
 										)));
 		layout.setVerticalGroup(
 				layout.createParallelGroup()
@@ -535,13 +536,20 @@ public class SmssPage extends JFrame {
 								.addComponent(emptyLabel)
 								.addComponent(messagesDropdown)
 								.addComponent(addMessageToEditorButton)
-								.addComponent(emptyLabel))
+								.addComponent(removeLastEditorElementButton))
 						.addComponent(overviewScrollPane))
 				.addGroup(layout.createParallelGroup()
 						.addComponent(horizontalLineLast))
 				);
 		methodCreateButton.setEnabled(false);
 		senderCreateButton.setEnabled(false);
+		classCreateButton.setEnabled(false);
+		createReceiverButton.setEnabled(false);
+		createMessageButton.setEnabled(false);
+		createOperandButton.setEnabled(false);
+		createFragmentButton.setEnabled(false);
+		addFragmentToEditorButton.setEnabled(false);
+		addMessageToEditorButton.setEnabled(false);
 		pack();
 
 							
@@ -671,34 +679,7 @@ public class SmssPage extends JFrame {
 					
 					}
 				}
-				System.out.println(SmssApplication.getSmss().getMethod().getSpecificElements().size());
 			}
-		
-		
-	
-			
-				/*for (RouteAssignment assignment : BtmsController.getAssignmentsForDate((Date) overviewDatePicker.getModel().getValue())) {
-						BusVehicle bus = assignment.getBus();
-						String busText = bus.getLicencePlate();
-						if (bus.getRepairStatus().equals(RepairStatus.InRepairShop)) {
-							busText = busText + " (in repair)";
-						}
-						if (assignment.getDriverSchedules().size() == 0) {
-							Object[] obj = {assignment.getRoute().getNumber(), busText, "---", "---"};
-							overviewDtm.addRow(obj);
-						}
-						else {
-							for (DriverSchedule schedule : assignment.getDriverSchedules()) {
-								Driver driver = schedule.getDriver();
-								String driverText = "#" + driver.getId() + " " + driver.getName();
-								if (driver.getSickStatus().equals(SickStatus.Sick)) {
-									driverText = driverText + " (sick)";
-								}
-								Object[] obj = {assignment.getRoute().getNumber(), busText, schedule.getShift(), driverText};
-								overviewDtm.addRow(obj);
-							}
-						}
-					}*/
 				
 		Dimension d = overviewTable.getPreferredSize();
 		overviewScrollPane.setPreferredSize(new Dimension(d.width, HEIGHT_OVERVIEW_TABLE));
@@ -720,6 +701,9 @@ public class SmssPage extends JFrame {
 		try {
 			SmssController.createSmss(smssTextField.getText());
 			smssCreateButton.setEnabled(false);
+			methodCreateButton.setEnabled(true);
+			senderCreateButton.setEnabled(true);
+			classCreateButton.setEnabled(true);
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
 		}
@@ -739,6 +723,7 @@ public class SmssPage extends JFrame {
 			// call the controller
 			SmssController.createMethod(methodTextField.getText());
 			methodCreateButton.setEnabled(false);
+			createReceiverButton.setEnabled(true);
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
 		}
@@ -800,7 +785,7 @@ public class SmssPage extends JFrame {
 			else {
 				ClassType classType = SmssController.getClassTypeByName(classes.get(selectedClassType2).getName());
 				SmssController.createReceiver(classType.getName(), receiverTextField.getText());
-				
+				createMessageButton.setEnabled(true);			
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
@@ -823,10 +808,9 @@ public class SmssPage extends JFrame {
 				throw(new InvalidInputException("Receiver must be selected"));
 			}else {
 				ReceiverObject receiverObj = SmssController.getReceiverByName(receivers.get(selectedReceiver2).getName());
-				System.out.print(receiverObj.getClassType().getName());
-				System.out.print(receiverObj.getClassType().getName());
-
 				SmssController.createMessage(messageTextfield.getText(), receiverObj.getName());
+				createOperandButton.setEnabled(true);		
+				addMessageToEditorButton.setEnabled(true);
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
@@ -840,17 +824,18 @@ public class SmssPage extends JFrame {
 		// clear error message	
 		error = null;
 		try{
-			
-		List<String> selectedValues = messageList1.getSelectedValuesList();
-		List<Message> messages = new ArrayList<>();
-		System.out.println(selectedValues.size());
-		for(String value: selectedValues) {
-			
-			messages.add(SmssController.getMessageByName(value));
-		}
+			List<String> selectedValues = messageList1.getSelectedValuesList();
+			if(selectedValues.size() < 1) {
+				throw(new InvalidInputException("Must choose at least 1 message in an operand"));
+			}
+			List<Message> messages = new ArrayList<>();
+			for(String value: selectedValues) {
+				messages.add(SmssController.getMessageByName(value));
+			}
 		
-		//call the controller
-		SmssController.createSpecificOperand(operandCondition.getText(), messages);
+			//call the controller
+			SmssController.createSpecificOperand(operandCondition.getText(), messages);
+			createFragmentButton.setEnabled(true);
 		}catch (InvalidInputException e) {
 			error = e.getMessage();
 		}
@@ -876,7 +861,6 @@ public class SmssPage extends JFrame {
 					
 					if(value.contains(" ")){
 						selectedOperandId = value.substring(8,9); 
-						System.out.println(selectedOperandId);
 						specificOperands.add(SmssController.getSpecificOperandById(Integer.parseInt(selectedOperandId)));
 					}
 					else {
@@ -885,6 +869,7 @@ public class SmssPage extends JFrame {
 				}
 				selectedFragmentType = (String)fragmentTypeDropdown.getSelectedItem();
 				SmssController.createFragment(selectedFragmentType, specificOperands);
+				addFragmentToEditorButton.setEnabled(true);
 			}
 		} catch (InvalidInputException e) {
 			error = e.getMessage();
@@ -898,12 +883,15 @@ public class SmssPage extends JFrame {
 		// clear error message	
 		error = null;
 		try{
-			
-			Fragment fragment = SmssController.getFragment(frags.get(selectedFragmentToEditor).getId());
-			SmssController.createSpecificElement(fragment);
-			}catch (InvalidInputException e) {
-				error = e.getMessage();
+			if(selectedFragmentToEditor == -1) {
+				throw(new InvalidInputException("No Fragment Selected"));
+			}else {
+				Fragment fragment = SmssController.getFragment(frags.get(selectedFragmentToEditor).getId());
+				SmssController.createSpecificElement(fragment);
 			}
+		}catch (InvalidInputException e) {
+				error = e.getMessage();
+		}
 			
 		//update visuals
 		refreshData();
@@ -912,10 +900,13 @@ public class SmssPage extends JFrame {
 	private void addMessageToEditorButtonActionPerformed(ActionEvent evt) {
 		// clear error message	
 		error = null;
-		try{
-		
-		Message message = SmssController.getMessageByName(msgs.get(selectedMessageToEditor).getName());
-		SmssController.createSpecificElement(message);
+		try{	
+			if(selectedMessageToEditor == -1) {
+				throw(new InvalidInputException("No Message Selected"));
+			}else {
+				Message message = SmssController.getMessageByName(msgs.get(selectedMessageToEditor).getName());
+				SmssController.createSpecificElement(message);
+			}
 		}catch (InvalidInputException e) {
 			error = e.getMessage();
 		}
@@ -923,6 +914,21 @@ public class SmssPage extends JFrame {
 		//update visuals
 		refreshData();
 	}
-
-
+	
+	private void removeLastEditorElementButtonActionPerformed(ActionEvent evt) {
+		// clear error message	
+		error = null;
+		try{	
+			if(!SmssController.hasSpecificElements()) {
+				throw(new InvalidInputException("No Messages or Fragments have been added to the editor"));
+			}else {
+				SmssController.removeLastSpecificElement();
+			}
+		}catch (InvalidInputException e) {
+			error = e.getMessage();
+		}
+			
+		//update visuals
+		refreshData();
+	}
 }

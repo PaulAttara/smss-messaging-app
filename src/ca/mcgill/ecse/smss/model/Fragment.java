@@ -24,13 +24,13 @@ public abstract class Fragment
   //Fragment Associations
   private List<SpecificOperand> specificOperands;
   private SMSS sMSS;
-  private SpecificElement specificElement;
+  private List<SpecificElement> specificElements;
 
   //------------------------
   // CONSTRUCTOR
   //------------------------
 
-  public Fragment(SMSS aSMSS, SpecificElement aSpecificElement, SpecificOperand... allSpecificOperands)
+  public Fragment(SMSS aSMSS, SpecificOperand... allSpecificOperands)
   {
     id = nextId++;
     specificOperands = new ArrayList<SpecificOperand>();
@@ -44,11 +44,7 @@ public abstract class Fragment
     {
       throw new RuntimeException("Unable to create fragment due to sMSS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
-    boolean didAddSpecificElement = setSpecificElement(aSpecificElement);
-    if (!didAddSpecificElement)
-    {
-      throw new RuntimeException("Unable to create fragment due to specificElement. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
-    }
+    specificElements = new ArrayList<SpecificElement>();
   }
 
   //------------------------
@@ -97,10 +93,35 @@ public abstract class Fragment
   {
     return sMSS;
   }
-  /* Code from template association_GetOne */
-  public SpecificElement getSpecificElement()
+  /* Code from template association_GetMany */
+  public SpecificElement getSpecificElement(int index)
   {
-    return specificElement;
+    SpecificElement aSpecificElement = specificElements.get(index);
+    return aSpecificElement;
+  }
+
+  public List<SpecificElement> getSpecificElements()
+  {
+    List<SpecificElement> newSpecificElements = Collections.unmodifiableList(specificElements);
+    return newSpecificElements;
+  }
+
+  public int numberOfSpecificElements()
+  {
+    int number = specificElements.size();
+    return number;
+  }
+
+  public boolean hasSpecificElements()
+  {
+    boolean has = specificElements.size() > 0;
+    return has;
+  }
+
+  public int indexOfSpecificElement(SpecificElement aSpecificElement)
+  {
+    int index = specificElements.indexOf(aSpecificElement);
+    return index;
   }
   /* Code from template association_IsNumberOfValidMethod */
   public boolean isNumberOfSpecificOperandsValid()
@@ -255,33 +276,76 @@ public abstract class Fragment
     wasSet = true;
     return wasSet;
   }
-  /* Code from template association_SetOneToOptionalOne */
-  public boolean setSpecificElement(SpecificElement aNewSpecificElement)
+  /* Code from template association_MinimumNumberOfMethod */
+  public static int minimumNumberOfSpecificElements()
   {
-    boolean wasSet = false;
-    if (aNewSpecificElement == null)
+    return 0;
+  }
+  /* Code from template association_AddManyToOptionalOne */
+  public boolean addSpecificElement(SpecificElement aSpecificElement)
+  {
+    boolean wasAdded = false;
+    if (specificElements.contains(aSpecificElement)) { return false; }
+    Fragment existingFragment = aSpecificElement.getFragment();
+    if (existingFragment == null)
     {
-      //Unable to setSpecificElement to null, as fragment must always be associated to a specificElement
-      return wasSet;
+      aSpecificElement.setFragment(this);
     }
-    
-    Fragment existingFragment = aNewSpecificElement.getFragment();
-    if (existingFragment != null && !equals(existingFragment))
+    else if (!this.equals(existingFragment))
     {
-      //Unable to setSpecificElement, the current specificElement already has a fragment, which would be orphaned if it were re-assigned
-      return wasSet;
+      existingFragment.removeSpecificElement(aSpecificElement);
+      addSpecificElement(aSpecificElement);
     }
-    
-    SpecificElement anOldSpecificElement = specificElement;
-    specificElement = aNewSpecificElement;
-    specificElement.setFragment(this);
+    else
+    {
+      specificElements.add(aSpecificElement);
+    }
+    wasAdded = true;
+    return wasAdded;
+  }
 
-    if (anOldSpecificElement != null)
+  public boolean removeSpecificElement(SpecificElement aSpecificElement)
+  {
+    boolean wasRemoved = false;
+    if (specificElements.contains(aSpecificElement))
     {
-      anOldSpecificElement.setFragment(null);
+      specificElements.remove(aSpecificElement);
+      aSpecificElement.setFragment(null);
+      wasRemoved = true;
     }
-    wasSet = true;
-    return wasSet;
+    return wasRemoved;
+  }
+  /* Code from template association_AddIndexControlFunctions */
+  public boolean addSpecificElementAt(SpecificElement aSpecificElement, int index)
+  {  
+    boolean wasAdded = false;
+    if(addSpecificElement(aSpecificElement))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfSpecificElements()) { index = numberOfSpecificElements() - 1; }
+      specificElements.remove(aSpecificElement);
+      specificElements.add(index, aSpecificElement);
+      wasAdded = true;
+    }
+    return wasAdded;
+  }
+
+  public boolean addOrMoveSpecificElementAt(SpecificElement aSpecificElement, int index)
+  {
+    boolean wasAdded = false;
+    if(specificElements.contains(aSpecificElement))
+    {
+      if(index < 0 ) { index = 0; }
+      if(index > numberOfSpecificElements()) { index = numberOfSpecificElements() - 1; }
+      specificElements.remove(aSpecificElement);
+      specificElements.add(index, aSpecificElement);
+      wasAdded = true;
+    } 
+    else 
+    {
+      wasAdded = addSpecificElementAt(aSpecificElement, index);
+    }
+    return wasAdded;
   }
 
   public void delete()
@@ -298,11 +362,9 @@ public abstract class Fragment
     {
       placeholderSMSS.removeFragment(this);
     }
-    SpecificElement existingSpecificElement = specificElement;
-    specificElement = null;
-    if (existingSpecificElement != null)
+    while( !specificElements.isEmpty() )
     {
-      existingSpecificElement.setFragment(null);
+      specificElements.get(0).setFragment(null);
     }
   }
 
@@ -311,7 +373,6 @@ public abstract class Fragment
   {
     return super.toString() + "["+
             "id" + ":" + getId()+ "]" + System.getProperties().getProperty("line.separator") +
-            "  " + "sMSS = "+(getSMSS()!=null?Integer.toHexString(System.identityHashCode(getSMSS())):"null") + System.getProperties().getProperty("line.separator") +
-            "  " + "specificElement = "+(getSpecificElement()!=null?Integer.toHexString(System.identityHashCode(getSpecificElement())):"null");
+            "  " + "sMSS = "+(getSMSS()!=null?Integer.toHexString(System.identityHashCode(getSMSS())):"null");
   }
 }
