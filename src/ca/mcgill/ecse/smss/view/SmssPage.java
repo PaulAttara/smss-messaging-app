@@ -31,6 +31,7 @@ import javax.swing.table.TableCellRenderer;
 import ca.mcgill.ecse.smss.controller.SmssController;
 import ca.mcgill.ecse.smss.model.SMSS;
 import ca.mcgill.ecse.smss.model.SenderObject;
+import ca.mcgill.ecse.smss.model.SpecificElement;
 import ca.mcgill.ecse.smss.model.SpecificOperand;
 import ca.mcgill.ecse.smss.model.ClassType;
 import ca.mcgill.ecse.smss.model.Fragment;
@@ -138,6 +139,8 @@ public class SmssPage extends JFrame {
 
 	private HashMap<Integer, ClassType> classes;
 	private List<ReceiverObject> receivers;
+	private List<Message> msgs;
+	private List<Fragment> frags;
 
 	public SmssPage() throws InvalidInputException {
 		initComponents();
@@ -595,40 +598,45 @@ public class SmssPage extends JFrame {
 			
 			if(SmssController.hasMessages()) 
 			{
+				msgs = new ArrayList<Message>();
 				messagesDropdown.removeAllItems();
 				listModelMessages.removeAllElements();
 				for (Message message : SmssController.getMessages()) {
+					msgs.add(message);
+					listModelMessages.addElement(message.getName());
 					String msgstring = message.getSenderObject().getName() + "--" + message.getName() + "-->" + message.getReceiverObject().getName() + ":" + message.getReceiverObject().getClassType().getName() ;
 					messagesDropdown.addItem(msgstring);
-					listModelMessages.addElement(msgstring);
 
 				};
+				selectedMessageToEditor = -1;
+				messagesDropdown.setSelectedIndex(selectedMessageToEditor);
+
 			}
 			
 			if(SmssController.hasSpecificOperands()) 
 			{
 				listModelOperands.removeAllElements();
 				for (SpecificOperand specificOperand : SmssController.getSpecificOperands()) {
-					String stringbuild = "Operand" + specificOperand.getId() + "/ Condition: [" + specificOperand.getOperand().getCondition() + "] / Message Count:" + specificOperand.getMessages().size();
+					String stringbuild = "Operand " + specificOperand.getId() + " - Condition: [" + specificOperand.getOperand().getCondition() + "] - Message Count:" + specificOperand.getMessages().size();
 					listModelOperands.addElement(stringbuild);
 				};
 			}
 			
 			if(SmssController.hasFragments()) 
 			{
+				frags = new ArrayList<Fragment>();
 				fragmentDropdown.removeAllItems();
 				for (Fragment fragment : SmssController.getFragments()) {
-					String stringbuild = "Fragment " + fragment.getId() + ": " + fragment.getClass() + "/ Operands: " + fragment.getSpecificOperands().size();
+					String stringbuild = "Fragment " + fragment.getId() + ": " + fragment.getClass().toString().substring(32,fragment.getClass().toString().length()) + " - Operands: " + fragment.getSpecificOperands().size();
+					frags.add(fragment);
 					fragmentDropdown.addItem(stringbuild);
 				};
+				
+				selectedFragmentToEditor = -1;
+				fragmentDropdown.setSelectedIndex(selectedFragmentToEditor);
 			}
 		
-		}
-		catch(InvalidInputException e) {
-			error = e.getMessage(); 
-		}
-
-		
+	
 		// editor table
 		overviewDtm = new DefaultTableModel(0, 0);
 		overviewDtm.setColumnIdentifiers(overviewColumnNames);
@@ -642,6 +650,30 @@ public class SmssPage extends JFrame {
 			Object[] obj = {"   " + SmssController.getMethodName()};
 			overviewDtm.addRow(obj);
 		}
+		
+		if(SmssController.hasSpecificElements()) {
+			for(SpecificElement elm : SmssApplication.getSmss().getMethod().getSpecificElements()) {
+				if(elm.hasMessage()) {
+					Object[] obj = {"       " + elm.getMessage().getSenderObject().getName() + "--" + elm.getMessage().getName() + "-->" + elm.getMessage().getReceiverObject().getName() + ":" + elm.getMessage().getReceiverObject().getClassType().getName() };
+					overviewDtm.addRow(obj);
+				}else if(elm.hasFragment()) {
+					Object[] type = {"       " + elm.getFragment().getClass().toString().substring(32,35).toUpperCase()};
+					overviewDtm.addRow(type);
+					for(SpecificOperand op : elm.getFragment().getSpecificOperands()) {
+						Object[] operand = {"         [ " + op.getOperand().getCondition()+"]"};
+						overviewDtm.addRow(operand);
+						for(Message msg : op.getMessages()) {
+							Object[] message = {"            " +  msg.getSenderObject().getName() + "--" + msg.getName() + "-->" + msg.getReceiverObject().getName() + ":" + msg.getReceiverObject().getClassType().getName() };
+							overviewDtm.addRow(message);
+
+						}
+					}
+					
+					}
+				}
+				System.out.println(SmssApplication.getSmss().getMethod().getSpecificElements().size());
+			}
+		
 		
 	
 			
@@ -672,6 +704,10 @@ public class SmssPage extends JFrame {
 		overviewScrollPane.setPreferredSize(new Dimension(d.width, HEIGHT_OVERVIEW_TABLE));
 					
 		pack();
+	}
+	catch(InvalidInputException e) {
+		error = e.getMessage(); 
+	}
 		}
 	}
 		
@@ -807,8 +843,9 @@ public class SmssPage extends JFrame {
 			
 		List<String> selectedValues = messageList1.getSelectedValuesList();
 		List<Message> messages = new ArrayList<>();
-
+		System.out.println(selectedValues.size());
 		for(String value: selectedValues) {
+			
 			messages.add(SmssController.getMessageByName(value));
 		}
 		
@@ -838,7 +875,7 @@ public class SmssPage extends JFrame {
 				for(String value: selectedValues) {
 					
 					if(value.contains(" ")){
-						selectedOperandId = value.substring(0, value.indexOf(" ")); 
+						selectedOperandId = value.substring(8,9); 
 						System.out.println(selectedOperandId);
 						specificOperands.add(SmssController.getSpecificOperandById(Integer.parseInt(selectedOperandId)));
 					}
@@ -862,18 +899,11 @@ public class SmssPage extends JFrame {
 		error = null;
 		try{
 			
-		List<String> selectedValues = messageList1.getSelectedValuesList();
-		List<Message> messages = new ArrayList<>();
-
-		for(String value: selectedValues) {
-			messages.add(SmssController.getMessageByName(value));
-		}
-		
-		//call the controller
-		SmssController.createSpecificOperand(operandCondition.getText(), messages);
-		}catch (InvalidInputException e) {
-			error = e.getMessage();
-		}
+			Fragment fragment = SmssController.getFragment(frags.get(selectedFragmentToEditor).getId());
+			SmssController.createSpecificElement(fragment);
+			}catch (InvalidInputException e) {
+				error = e.getMessage();
+			}
 			
 		//update visuals
 		refreshData();
@@ -883,16 +913,9 @@ public class SmssPage extends JFrame {
 		// clear error message	
 		error = null;
 		try{
-			
-		List<String> selectedValues = messageList1.getSelectedValuesList();
-		List<Message> messages = new ArrayList<>();
-
-		for(String value: selectedValues) {
-			messages.add(SmssController.getMessageByName(value));
-		}
 		
-		//call the controller
-		SmssController.createSpecificOperand(operandCondition.getText(), messages);
+		Message message = SmssController.getMessageByName(msgs.get(selectedMessageToEditor).getName());
+		SmssController.createSpecificElement(message);
 		}catch (InvalidInputException e) {
 			error = e.getMessage();
 		}

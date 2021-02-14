@@ -396,7 +396,12 @@ public class SmssController {
 	}
 	
 	public static boolean hasSpecificElements() throws InvalidInputException {
-		return SmssApplication.getSmss().getMethod().getSpecificElements().size() > 0;
+		if(SmssApplication.getSmss().getMethod() != null) {
+			return SmssApplication.getSmss().getMethod().getSpecificElements().size() > 0;
+		}else {
+			return false;
+		}
+			
 	}
 	
 	public static boolean hasFragments() throws InvalidInputException {
